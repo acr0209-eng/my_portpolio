@@ -94,10 +94,12 @@ function App() {
   const mergeWithInitialPosts = (storedPosts) => {
     if (!Array.isArray(storedPosts)) return initialPosts;
 
-    const storedUrls = new Set(storedPosts.map(post => post.url));
+    const initialPostsByUrl = new Map(initialPosts.map(post => [post.url, post]));
+    const refreshedStoredPosts = storedPosts.map(post => initialPostsByUrl.get(post.url) || post);
+    const storedUrls = new Set(refreshedStoredPosts.map(post => post.url));
     const missingInitialPosts = initialPosts.filter(post => !storedUrls.has(post.url));
 
-    return [...storedPosts, ...missingInitialPosts];
+    return [...refreshedStoredPosts, ...missingInitialPosts];
   };
 
   const [logs, setLogs] = useState(() => JSON.parse(localStorage.getItem('tesla_logs')) || initialLogs);
