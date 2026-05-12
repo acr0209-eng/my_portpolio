@@ -70,7 +70,7 @@ function App() {
     { id: 3, title: 'Sepsis Prediction Model', desc: '데이터의 공백 속에서 도출하는 강건한 인프라 예측 모델' }
   ];
   const initialPosts = [
-    { id: 201, title: '데이터 분석의 본질', url: 'https://uni0790.tistory.com/1', desc: '인프라 신뢰성을 확보하는 의사결정 기록' },
+    { id: 201, title: '기업 경영과 보안', url: 'https://uni0790.tistory.com/1', desc: '인프라 신뢰성을 확보하는 의사결정 기록' },
     {
       id: 202,
       title: '삼성바이오로직스 영업비밀 유출 사건 분석',
