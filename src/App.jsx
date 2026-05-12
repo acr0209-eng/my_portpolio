@@ -72,6 +72,24 @@ function App() {
   const initialPosts = [
     { id: 201, title: '데이터 분석의 본질', url: 'https://uni0790.tistory.com/1', desc: '인프라 신뢰성을 확보하는 의사결정 기록' }
   ];
+  const selectedProjects = [
+    {
+      id: 101,
+      title: 'AI 기반 투자 의사결정 실험',
+      desc: '정보 아키텍처가 시스템 신뢰도에 미치는 영향 분석'
+    },
+    {
+      id: 102,
+      title: 'ICU 패혈증 예측 분석',
+      desc: '데이터의 공백 속에서 도출하는 강건한 인프라 예측 모델'
+    },
+    {
+      id: 103,
+      title: '삼성바이오로직스 영업비밀 유출 사건 분석',
+      desc: '삼성바이오로직스 영업비밀 유출 사례를 내부자 위협, SOP 자산 가치, 제로 트러스트 관점으로 정리해 보안 의사결정 포인트를 도출한 산업보안 프로젝트',
+      url: 'https://uni0790.tistory.com/2'
+    }
+  ];
 
   const [logs, setLogs] = useState(() => JSON.parse(localStorage.getItem('tesla_logs')) || initialLogs);
   const [posts, setPosts] = useState(() => JSON.parse(localStorage.getItem('tesla_posts')) || initialPosts);
@@ -139,18 +157,21 @@ function App() {
         </div>
       </section>
 
-      {/* Projects (EXPLORE 버튼만 깔끔하게 제거됨) */}
+      {/* Projects */}
       <section id="projects" className="section container">
         <h2 style={{letterSpacing: '0.3em', fontSize: '0.75rem', marginBottom: '80px', color: 'var(--muted)'}} className="reveal-text" ref={addReveal}>SELECTED PROJECTS</h2>
         <div className="project-grid">
-          <div className="project-card magnetic-element" ref={addMagnetic}>
-            <h3>AI 기반 투자 의사결정 실험</h3>
-            <p>정보 아키텍처가 시스템 신뢰도에 미치는 영향 분석</p>
-          </div>
-          <div className="project-card magnetic-element" ref={addMagnetic}>
-            <h3>ICU 패혈증 예측 분석</h3>
-            <p>데이터의 공백 속에서 도출하는 강건한 인프라 예측 모델</p>
-          </div>
+          {selectedProjects.map(project => (
+            <div key={project.id} className="project-card magnetic-element" ref={addMagnetic}>
+              <h3>{project.title}</h3>
+              <p>{project.desc}</p>
+              {project.url && (
+                <a className="explore-btn" href={project.url} target="_blank" rel="noreferrer">
+                  EXPLORE →
+                </a>
+              )}
+            </div>
+          ))}
         </div>
       </section>
 

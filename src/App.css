@@ -96,6 +96,12 @@ body.v-hovering #cursor-outline { width: 55px; height: 55px; background: rgba(25
   display: inline-block;
   letter-spacing: 0.1em;
   background: transparent;
+  text-decoration: none;
+}
+.explore-btn:hover {
+  background: #fff;
+  border-color: #fff;
+  color: #050505;
 }
 
 
