@@ -70,7 +70,13 @@ function App() {
     { id: 3, title: 'Sepsis Prediction Model', desc: '데이터의 공백 속에서 도출하는 강건한 인프라 예측 모델' }
   ];
   const initialPosts = [
-    { id: 201, title: '데이터 분석의 본질', url: 'https://uni0790.tistory.com/1', desc: '인프라 신뢰성을 확보하는 의사결정 기록' }
+    { id: 201, title: '데이터 분석의 본질', url: 'https://uni0790.tistory.com/1', desc: '인프라 신뢰성을 확보하는 의사결정 기록' },
+    {
+      id: 202,
+      title: '삼성바이오로직스 영업비밀 유출 사건 분석',
+      url: 'https://uni0790.tistory.com/2',
+      desc: '내부자 위협, SOP 자산 가치, 제로 트러스트 관점에서 산업보안 의사결정 포인트를 정리한 분석 기록'
+    }
   ];
   const selectedProjects = [
     {
@@ -82,17 +88,20 @@ function App() {
       id: 102,
       title: 'ICU 패혈증 예측 분석',
       desc: '데이터의 공백 속에서 도출하는 강건한 인프라 예측 모델'
-    },
-    {
-      id: 103,
-      title: '삼성바이오로직스 영업비밀 유출 사건 분석',
-      desc: '삼성바이오로직스 영업비밀 유출 사례를 내부자 위협, SOP 자산 가치, 제로 트러스트 관점으로 정리해 보안 의사결정 포인트를 도출한 산업보안 프로젝트',
-      url: 'https://uni0790.tistory.com/2'
     }
   ];
 
+  const mergeWithInitialPosts = (storedPosts) => {
+    if (!Array.isArray(storedPosts)) return initialPosts;
+
+    const storedUrls = new Set(storedPosts.map(post => post.url));
+    const missingInitialPosts = initialPosts.filter(post => !storedUrls.has(post.url));
+
+    return [...storedPosts, ...missingInitialPosts];
+  };
+
   const [logs, setLogs] = useState(() => JSON.parse(localStorage.getItem('tesla_logs')) || initialLogs);
-  const [posts, setPosts] = useState(() => JSON.parse(localStorage.getItem('tesla_posts')) || initialPosts);
+  const [posts, setPosts] = useState(() => mergeWithInitialPosts(JSON.parse(localStorage.getItem('tesla_posts'))));
   const [isAdmin, setIsAdmin] = useState(false);
   const [pass, setPass] = useState("");
   const [newLog, setNewLog] = useState({ title: '', desc: '' });
