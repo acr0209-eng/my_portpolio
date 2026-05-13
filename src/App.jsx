@@ -1,5 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import './App.css';
+import postsData from './data/posts.json';
+import projectsData from './data/projects.json';
 
 function App() {
   const canvasRef = useRef(null);
@@ -63,55 +65,18 @@ function App() {
     return () => { window.removeEventListener('mousemove', move); obs.disconnect(); };
   }, []);
 
-  // --- Initial Data ---
   const initialLogs = [
     { id: 1, title: '중앙대학교 산업보안학과 편입', desc: '클라우드 인프라 및 네트워크 보안 아키텍처 전공' },
     { id: 2, title: 'Global Metrics', desc: 'TOEIC 990 / TOEFL 115 달성' },
     { id: 3, title: 'Sepsis Prediction Model', desc: '데이터의 공백 속에서 도출하는 강건한 인프라 예측 모델' }
   ];
-  const initialPosts = [
-    { id: 201, title: '기업경영과 보안', url: 'https://uni0790.tistory.com/1', desc: '기업 의사결정, 보안 거버넌스, 내부통제 관점에서 정리한 기록' },
-    {
-      id: 202,
-      title: '삼성바이오로직스 영업비밀 유출 사건 분석',
-      url: 'https://uni0790.tistory.com/2',
-      desc: '내부자 위협, SOP 자산 가치, 제로 트러스트 관점에서 산업보안 의사결정 포인트를 정리한 분석 기록'
-    }
-  ];
-  const selectedProjects = [
-    {
-      id: 101,
-      title: 'AI 기반 투자 의사결정 실험',
-      desc: '정보 아키텍처가 시스템 신뢰도에 미치는 영향 분석'
-    },
-    {
-      id: 102,
-      title: 'ICU 패혈증 예측 분석',
-      desc: '데이터의 공백 속에서 도출하는 강건한 인프라 예측 모델'
-    }
-  ];
 
-  const mergeWithInitialPosts = (storedPosts) => {
-    if (!Array.isArray(storedPosts)) return initialPosts;
-
-    const initialPostsById = new Map(initialPosts.map(post => [post.id, post]));
-    const initialPostsByUrl = new Map(initialPosts.map(post => [post.url, post]));
-    const refreshedStoredPosts = storedPosts.map(post => initialPostsById.get(post.id) || initialPostsByUrl.get(post.url) || post);
-    const storedIds = new Set(refreshedStoredPosts.map(post => post.id));
-    const storedUrls = new Set(refreshedStoredPosts.map(post => post.url));
-    const missingInitialPosts = initialPosts.filter(post => !storedIds.has(post.id) && !storedUrls.has(post.url));
-
-    return [...refreshedStoredPosts, ...missingInitialPosts];
-  };
-
-  const [logs, setLogs] = useState(() => JSON.parse(localStorage.getItem('tesla_logs')) || initialLogs);
-  const [posts, setPosts] = useState(() => mergeWithInitialPosts(JSON.parse(localStorage.getItem('tesla_posts'))));
+  const [logs, setLogs] = useState(initialLogs);
+  const [posts, setPosts] = useState(postsData);
   const [isAdmin, setIsAdmin] = useState(false);
   const [pass, setPass] = useState("");
   const [newLog, setNewLog] = useState({ title: '', desc: '' });
   const [newPost, setNewPost] = useState({ title: '', url: '', desc: '' });
-
-  useEffect(() => { localStorage.setItem('tesla_logs', JSON.stringify(logs)); localStorage.setItem('tesla_posts', JSON.stringify(posts)); }, [logs, posts]);
 
   const login = () => (pass === "0790") ? setIsAdmin(true) : alert("Access Denied");
 
@@ -174,7 +139,7 @@ function App() {
       <section id="projects" className="section container">
         <h2 style={{letterSpacing: '0.3em', fontSize: '0.75rem', marginBottom: '80px', color: 'var(--muted)'}} className="reveal-text" ref={addReveal}>SELECTED PROJECTS</h2>
         <div className="project-grid">
-          {selectedProjects.map(project => (
+          {projectsData.map(project => (
             <div key={project.id} className="project-card magnetic-element" ref={addMagnetic}>
               <h3>{project.title}</h3>
               <p>{project.desc}</p>
@@ -224,17 +189,18 @@ function App() {
         ) : (
           <div className="reveal-text visible">
             <h2 style={{letterSpacing: '0.3em', fontSize: '0.75rem', marginBottom: '60px', color: 'var(--accent)'}}>ADMIN MODE</h2>
+            <p style={{color: 'var(--muted)', marginBottom: '30px'}}>사이트에 영구 반영하려면 GitHub에서 src/data/posts.json 또는 src/data/projects.json을 수정하세요.</p>
             <div className="project-grid">
               <form className="log-form" onSubmit={e => { e.preventDefault(); setPosts([{id: Date.now(), ...newPost}, ...posts]); setNewPost({title:'', url:'', desc:''}); }}>
-                <input className="log-input" placeholder="제목" onChange={e => setNewPost({...newPost, title: e.target.value})} />
-                <input className="log-input" placeholder="URL" onChange={e => setNewPost({...newPost, url: e.target.value})} />
-                <input className="log-input" placeholder="요약" onChange={e => setNewPost({...newPost, desc: e.target.value})} />
-                <button className="btn-tesla" type="submit" ref={addMagnetic}>PUBLISH</button>
+                <input className="log-input" placeholder="제목" value={newPost.title} onChange={e => setNewPost({...newPost, title: e.target.value})} />
+                <input className="log-input" placeholder="URL" value={newPost.url} onChange={e => setNewPost({...newPost, url: e.target.value})} />
+                <input className="log-input" placeholder="요약" value={newPost.desc} onChange={e => setNewPost({...newPost, desc: e.target.value})} />
+                <button className="btn-tesla" type="submit" ref={addMagnetic}>PREVIEW ONLY</button>
               </form>
               <form className="log-form" onSubmit={e => { e.preventDefault(); setLogs([{id: Date.now(), ...newLog}, ...logs]); setNewLog({title:'', desc:''}); }}>
-                <input className="log-input" placeholder="활동명" onChange={e => setNewLog({...newLog, title: e.target.value})} />
-                <input className="log-input" placeholder="상세내용" onChange={e => setNewLog({...newLog, desc: e.target.value})} />
-                <button className="btn-tesla" type="submit" ref={addMagnetic}>LOG</button>
+                <input className="log-input" placeholder="활동명" value={newLog.title} onChange={e => setNewLog({...newLog, title: e.target.value})} />
+                <input className="log-input" placeholder="상세내용" value={newLog.desc} onChange={e => setNewLog({...newLog, desc: e.target.value})} />
+                <button className="btn-tesla" type="submit" ref={addMagnetic}>LOG PREVIEW</button>
               </form>
             </div>
             <button className="btn-tesla" style={{marginTop: '40px', background: 'transparent', color: '#ff4d4d', border: '1px solid #ff4d4d'}} onClick={() => setIsAdmin(false)}>LOCK SYSTEM</button>
