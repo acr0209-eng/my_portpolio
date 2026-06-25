@@ -1,12 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import './App.css';
-<<<<<<< Updated upstream
 import postsData from './data/posts.json';
 import projectsData from './data/projects.json';
-=======
-import posts from './data/posts.json';
-import projects from './data/projects.json';
->>>>>>> Stashed changes
 
 function App() {
   const canvasRef = useRef(null);
@@ -75,27 +70,14 @@ function App() {
     { id: 2, title: 'Global Metrics', desc: 'TOEIC 990 / TOEFL 115 달성' },
     { id: 3, title: 'Sepsis Prediction Model', desc: '데이터의 공백 속에서 도출하는 강건한 인프라 예측 모델' }
   ];
-<<<<<<< Updated upstream
 
   const [logs, setLogs] = useState(initialLogs);
   const [posts, setPosts] = useState(postsData);
-=======
-  const [logs, setLogs] = useState(() => JSON.parse(localStorage.getItem('tesla_logs')) || initialLogs);
-  const [draftPosts, setDraftPosts] = useState(() => JSON.parse(localStorage.getItem('tesla_draft_posts')) || []);
->>>>>>> Stashed changes
   const [isAdmin, setIsAdmin] = useState(false);
   const [pass, setPass] = useState("");
   const [newLog, setNewLog] = useState({ title: '', desc: '' });
   const [newPost, setNewPost] = useState({ title: '', url: '', desc: '' });
 
-<<<<<<< Updated upstream
-=======
-  useEffect(() => {
-    localStorage.setItem('tesla_logs', JSON.stringify(logs));
-    localStorage.setItem('tesla_draft_posts', JSON.stringify(draftPosts));
-  }, [logs, draftPosts]);
-
->>>>>>> Stashed changes
   const login = () => (pass === "0790") ? setIsAdmin(true) : alert("Access Denied");
 
   return (
@@ -157,11 +139,7 @@ function App() {
       <section id="projects" className="section container">
         <h2 style={{letterSpacing: '0.3em', fontSize: '0.75rem', marginBottom: '80px', color: 'var(--muted)'}} className="reveal-text" ref={addReveal}>SELECTED PROJECTS</h2>
         <div className="project-grid">
-<<<<<<< Updated upstream
           {projectsData.map(project => (
-=======
-          {projects.map(project => (
->>>>>>> Stashed changes
             <div key={project.id} className="project-card magnetic-element" ref={addMagnetic}>
               <h3>{project.title}</h3>
               <p>{project.desc}</p>
@@ -186,6 +164,7 @@ function App() {
                 <h3>{p.title}</h3><p>{p.desc}</p>
                 <div className="explore-btn">EXPLORE →</div>
               </a>
+              {isAdmin && <button className="btn-delete" style={{position:'absolute', top:'30px', right:'30px'}} onClick={() => setPosts(posts.filter(x => x.id !== p.id))}>X</button>}
             </div>
           ))}
         </div>
@@ -209,7 +188,6 @@ function App() {
           </div>
         ) : (
           <div className="reveal-text visible">
-<<<<<<< Updated upstream
             <h2 style={{letterSpacing: '0.3em', fontSize: '0.75rem', marginBottom: '60px', color: 'var(--accent)'}}>ADMIN MODE</h2>
             <p style={{color: 'var(--muted)', marginBottom: '30px'}}>사이트에 영구 반영하려면 GitHub에서 src/data/posts.json 또는 src/data/projects.json을 수정하세요.</p>
             <div className="project-grid">
@@ -218,18 +196,6 @@ function App() {
                 <input className="log-input" placeholder="URL" value={newPost.url} onChange={e => setNewPost({...newPost, url: e.target.value})} />
                 <input className="log-input" placeholder="요약" value={newPost.desc} onChange={e => setNewPost({...newPost, desc: e.target.value})} />
                 <button className="btn-tesla" type="submit" ref={addMagnetic}>PREVIEW ONLY</button>
-=======
-            <h2 style={{letterSpacing: '0.3em', fontSize: '0.75rem', marginBottom: '20px', color: 'var(--accent)'}}>LOCAL DRAFT ONLY</h2>
-            <p style={{maxWidth: '720px', margin: '0 auto 60px', color: 'var(--muted)', lineHeight: 1.8}}>
-              Public writings and projects are deployed from src/data JSON files. This area only saves browser preview drafts.
-            </p>
-            <div className="project-grid">
-              <form className="log-form" onSubmit={e => { e.preventDefault(); setDraftPosts([{id: Date.now(), ...newPost}, ...draftPosts]); setNewPost({title:'', url:'', desc:''}); }}>
-                <input className="log-input" placeholder="제목" onChange={e => setNewPost({...newPost, title: e.target.value})} />
-                <input className="log-input" placeholder="URL" onChange={e => setNewPost({...newPost, url: e.target.value})} />
-                <input className="log-input" placeholder="요약" onChange={e => setNewPost({...newPost, desc: e.target.value})} />
-                <button className="btn-tesla" type="submit" ref={addMagnetic}>SAVE DRAFT</button>
->>>>>>> Stashed changes
               </form>
               <form className="log-form" onSubmit={e => { e.preventDefault(); setLogs([{id: Date.now(), ...newLog}, ...logs]); setNewLog({title:'', desc:''}); }}>
                 <input className="log-input" placeholder="활동명" value={newLog.title} onChange={e => setNewLog({...newLog, title: e.target.value})} />
@@ -237,21 +203,6 @@ function App() {
                 <button className="btn-tesla" type="submit" ref={addMagnetic}>LOG PREVIEW</button>
               </form>
             </div>
-            {draftPosts.length > 0 && (
-              <div style={{marginTop: '60px'}}>
-                <h3 style={{fontSize: '0.75rem', letterSpacing: '0.2em', color: 'var(--muted)', marginBottom: '30px'}}>LOCAL PREVIEW DRAFTS</h3>
-                <div className="project-grid">
-                  {draftPosts.map(draft => (
-                    <div key={draft.id} className="project-card magnetic-element" ref={addMagnetic}>
-                      <h3>{draft.title}</h3>
-                      <p>{draft.desc}</p>
-                      {draft.url && <a className="explore-btn" href={draft.url} target="_blank" rel="noreferrer">EXPLORE →</a>}
-                      <button className="btn-delete" style={{position:'absolute', top:'30px', right:'30px'}} onClick={() => setDraftPosts(draftPosts.filter(x => x.id !== draft.id))}>X</button>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
             <button className="btn-tesla" style={{marginTop: '40px', background: 'transparent', color: '#ff4d4d', border: '1px solid #ff4d4d'}} onClick={() => setIsAdmin(false)}>LOCK SYSTEM</button>
           </div>
         )}
