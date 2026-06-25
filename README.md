@@ -2,150 +2,132 @@
 
 React + Vite 기반 포트폴리오 사이트입니다.
 
+- 배포: GitHub Pages
+- 글 CMS: Firebase Authentication + Cloud Firestore
+- 기존 Tistory 글: `src/data/posts.json`에서 외부 아카이브로 계속 표시
+- 방문자 모니터링 실험: `exposurewatch-backend`
+
 ## 자동 배포
 
-`main` 브랜치에 변경 사항이 push되면 GitHub Actions가 자동으로 의존성을 설치하고, `npm run build`를 실행한 뒤 `dist` 결과물을 GitHub Pages에 배포합니다.
+`main` 브랜치에 변경 사항이 push되면 GitHub Actions가 의존성을 설치하고 `npm run build`를 실행한 뒤 `dist`를 GitHub Pages에 배포합니다.
 
-Vite `base` 설정은 저장소명 기준인 `/my_portpolio/`를 사용합니다.
+Vite `base`는 저장소명 기준인 `/my_portpolio/`를 사용합니다.
 
-로컬에서 `npm run deploy`를 직접 실행하는 스크립트는 남아 있지만, 기본 배포 방식은 GitHub Actions 자동 배포입니다.
+## Firebase CMS
 
-## 글 추가 방법
+사이트의 `ADMIN` 메뉴에서 본인 Firebase 계정으로 로그인하면 글을 직접 작성, 수정, 삭제할 수 있습니다.
 
-1. `src/data/posts.json` 열기
-2. 새 글 객체 추가
-3. `main`에 commit
-4. GitHub Actions가 자동 배포
+지원 필드:
 
-예시:
+- 제목
+- slug
+- 분류
+- 요약
+- Markdown 본문과 미리보기
+- 대표 이미지 URL
+- 태그
+- 공개/비공개
+- 작성일/수정일
 
-```json
-{
-  "id": 203,
-  "title": "새 글 제목",
-  "url": "https://example.com/post",
-  "desc": "글 설명"
-}
+일반 방문자는 공개 글만 읽을 수 있고, 관리자 UID와 일치하는 계정만 쓰기 작업을 할 수 있습니다.
+
+### 1. Firebase 프로젝트 설정
+
+1. Firebase Console에서 프로젝트를 생성합니다.
+2. Web App을 등록하고 Firebase 설정값을 복사합니다.
+3. Authentication에서 `Email/Password` 로그인을 활성화합니다.
+4. 관리자용 이메일 사용자를 1명 생성합니다.
+5. Authentication 사용자 목록에서 해당 사용자의 UID를 복사합니다.
+6. Firestore Database를 생성합니다.
+7. `firestore.rules`의 `PASTE_YOUR_FIREBASE_AUTH_UID`를 실제 UID로 바꾼 뒤 Firestore Rules에 배포합니다.
+
+### 2. 로컬 환경변수
+
+`.env.example`을 `.env`로 복사하고 값을 채웁니다.
+
+```env
+VITE_FIREBASE_API_KEY=
+VITE_FIREBASE_AUTH_DOMAIN=
+VITE_FIREBASE_PROJECT_ID=
+VITE_FIREBASE_STORAGE_BUCKET=
+VITE_FIREBASE_MESSAGING_SENDER_ID=
+VITE_FIREBASE_APP_ID=
+VITE_FIREBASE_OWNER_UID=
 ```
 
-## 프로젝트 추가 방법
+### 3. GitHub Pages 배포용 Secrets
 
-1. `src/data/projects.json` 열기
-2. 새 프로젝트 객체 추가
-3. `main`에 commit
-4. 자동 배포
-
-예시:
-
-```json
-{
-  "id": 103,
-  "title": "새 프로젝트 제목",
-  "desc": "프로젝트 설명"
-}
-```
-
-## Admin 영역
-
-사이트의 공개 글과 프로젝트는 `src/data` 아래 JSON 파일을 기준으로 렌더링됩니다.
-
-Admin 영역의 글 입력은 브라우저 임시 미리보기용 `Local Draft Only` 기능이며, 실제 배포 데이터에는 영향을 주지 않습니다.
-
-## ExposureWatch Backend
-
-ExposureWatch extends this portfolio with a Spring Boot based monitoring backend. The portfolio sends lightweight visitor events to the backend, where requests are stored, risk-scored, classified, and visualized in a real-time admin dashboard.
-
-ExposureWatch monitors automated scanners, crawlers, and suspicious HTTP request patterns commonly observed on internet-facing web services. It does not claim that someone is personally attacking this portfolio.
+GitHub 저장소의 `Settings → Secrets and variables → Actions`에서 다음 Repository secrets를 만듭니다.
 
 ```text
-[Portfolio Frontend]
-      |
-      | POST /api/collect
-      v
-[Spring Boot ExposureWatch Backend]
-      |
-      v
-[MySQL]
-      |
-      v
-[Admin Dashboard /admin/dashboard]
+VITE_FIREBASE_API_KEY
+VITE_FIREBASE_AUTH_DOMAIN
+VITE_FIREBASE_PROJECT_ID
+VITE_FIREBASE_STORAGE_BUCKET
+VITE_FIREBASE_MESSAGING_SENDER_ID
+VITE_FIREBASE_APP_ID
+VITE_FIREBASE_OWNER_UID
 ```
 
-### Tech Stack
+필요하면 `VITE_EXPOSUREWATCH_API_URL`도 같은 방식으로 추가합니다.
 
-- Portfolio frontend: existing React + Vite app
-- Backend: Java 17, Spring Boot 3.x, Gradle
-- Backend modules: Spring Web, Spring Data JPA, MySQL Driver, Spring Security, Spring WebSocket/STOMP, Thymeleaf
-- Dashboard: Thymeleaf, Chart.js, minimal JavaScript
-- Database: MySQL
+Secrets를 저장한 뒤 GitHub Actions의 `Deploy to GitHub Pages` workflow를 다시 실행하면 Firebase 설정이 포함된 사이트가 배포됩니다.
 
-### Run the Portfolio
+## 로컬 실행
 
 ```bash
 npm install
 npm run dev
 ```
 
-Create `.env` from `.env.example` and set:
+빌드 확인:
 
 ```bash
-VITE_EXPOSUREWATCH_API_URL=http://localhost:8080
+npm run build
 ```
 
-The portfolio calls `sendExposureEvent()` on initial load. If the backend is unavailable, the request fails silently and the portfolio remains usable.
+## 프로젝트 추가 방법
 
-### MySQL Setup
+`src/data/projects.json`에 프로젝트 객체를 추가한 뒤 `main`에 push합니다.
 
-```sql
-CREATE DATABASE exposurewatch CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-CREATE USER 'exposurewatch'@'localhost' IDENTIFIED BY 'change-me';
-GRANT ALL PRIVILEGES ON exposurewatch.* TO 'exposurewatch'@'localhost';
-FLUSH PRIVILEGES;
+```json
+{
+  "id": 103,
+  "title": "새 프로젝트 제목",
+  "desc": "프로젝트 설명",
+  "url": "https://example.com"
+}
 ```
 
-### Run the Backend
+## ExposureWatch Backend
+
+ExposureWatch는 포트폴리오 방문 이벤트를 Spring Boot 백엔드에 저장하고 위험 점수, 트래픽 분류, 관리자 대시보드로 확인하는 별도 실험 프로젝트입니다. Firebase CMS와는 독립적입니다.
+
+### 기술 스택
+
+- Frontend: React + Vite
+- Backend: Java 17, Spring Boot 3.x, Gradle
+- Database: MySQL
+- Dashboard: Thymeleaf + Chart.js
+
+### 백엔드 실행
 
 ```powershell
 cd exposurewatch-backend
 .\gradlew.bat bootRun
 ```
 
-If `gradlew.bat` reports that Gradle is not installed, install Gradle and run the same command again.
-
-Default development settings:
+기본 개발 주소:
 
 ```text
-Backend URL: http://localhost:8080
+Backend: http://localhost:8080
 Dashboard: http://localhost:8080/admin/dashboard
-Admin username: admin
-Admin password: change-me
-Allowed portfolio origin: http://localhost:5173
 ```
 
-To change CORS for a deployed portfolio, set:
+프런트엔드에서는 `.env`에 아래 값을 설정할 수 있습니다.
 
-```bash
-EXPOSUREWATCH_ALLOWED_ORIGIN=https://your-portfolio-domain.example
+```env
+VITE_EXPOSUREWATCH_API_URL=http://localhost:8080
 ```
 
-### Test Suspicious Paths
-
-Request these local backend paths while the backend is running:
-
-```text
-http://localhost:8080/wp-admin
-http://localhost:8080/.env
-http://localhost:8080/.git/config
-http://localhost:8080/phpmyadmin
-```
-
-These should create HIGH or CRITICAL scanner/suspicious logs.
-
-### Safety Notes
-
-- No exploit code is included.
-- No external targets are scanned.
-- No attacks are automated.
-- No offensive security features are implemented.
-- No real IP blocking is implemented in v1.
-- Admin actions only store review decisions: SAFE, WATCH, or BLOCK_CANDIDATE.
+백엔드가 실행되지 않아도 포트폴리오와 Firebase CMS는 독립적으로 동작합니다.
