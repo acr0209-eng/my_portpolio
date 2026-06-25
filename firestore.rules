@@ -1,0 +1,24 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isOwner() {
+      return request.auth != null
+        && request.auth.uid == 'PASTE_YOUR_FIREBASE_AUTH_UID';
+    }
+
+    match /posts/{postId} {
+      allow read: if resource.data.published == true || isOwner();
+
+      allow create: if isOwner()
+        && request.resource.data.ownerUid == request.auth.uid;
+
+      allow update: if isOwner()
+        && resource.data.ownerUid == request.auth.uid
+        && request.resource.data.ownerUid == request.auth.uid;
+
+      allow delete: if isOwner()
+        && resource.data.ownerUid == request.auth.uid;
+    }
+  }
+}
