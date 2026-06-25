@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>ExposureWatch Dashboard</title>
+    <link rel="stylesheet" th:href="@{/css/dashboard.css}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/@stomp/stompjs@7.0.0/bundles/stomp.umd.min.js" defer></script>
+    <script th:src="@{/js/dashboard.js}" defer></script>
+</head>
+<body th:data-risk="${riskDistribution}" th:data-traffic="${trafficDistribution}" th:data-hourly="${hourlyRequests}">
+<header class="topbar">
+    <div>
+        <p class="eyebrow">ExposureWatch</p>
+        <h1>Web Exposure Monitor</h1>
+    </div>
+    <form th:action="@{/logout}" method="post">
+        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+        <button class="ghost-button" type="submit">Sign out</button>
+    </form>
+</header>
+
+<main class="dashboard-shell">
+    <section class="summary-grid" aria-label="Today summary">
+        <article class="metric-card">
+            <span>Today's Requests</span>
+            <strong th:text="${summary.todayTotalRequests}">0</strong>
+        </article>
+        <article class="metric-card">
+            <span>Suspicious Today</span>
+            <strong th:text="${summary.todaySuspiciousRequests}">0</strong>
+        </article>
+        <article class="metric-card">
+            <span>HIGH / CRITICAL</span>
+            <strong th:text="${summary.todayHighCriticalRequests}">0</strong>
+        </article>
+        <article class="metric-card">
+            <span>Unique Suspicious IPs</span>
+            <strong th:text="${summary.uniqueSuspiciousIpCount}">0</strong>
+        </article>
+    </section>
+
+    <section class="chart-grid">
+        <article class="panel">
+            <h2>Risk Levels</h2>
+            <canvas id="riskChart" height="180"></canvas>
+        </article>
+        <article class="panel">
+            <h2>Traffic Types</h2>
+            <canvas id="trafficChart" height="180"></canvas>
+        </article>
+        <article class="panel wide">
+            <h2>Hourly Requests</h2>
+            <canvas id="hourlyChart" height="110"></canvas>
+        </article>
+    </section>
+
+    <section class="content-grid">
+        <article class="panel logs-panel">
+            <div class="panel-heading">
+                <h2>Recent Logs</h2>
+                <span id="liveStatus" class="live-status">Connecting</span>
+            </div>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                    <tr>
+                        <th>Time</th>
+                        <th>IP</th>
+                        <th>Path</th>
+                        <th>Risk</th>
+                        <th>Type</th>
+                        <th>Source</th>
+                    </tr>
+                    </thead>
+                    <tbody id="recentLogBody">
+                    <tr th:each="log : ${recentLogs}">
+                        <td th:text="${#temporals.format(log.createdAt, 'HH:mm:ss')}">12:00:00</td>
+                        <td th:text="${log.ipAddress}">127.0.0.1</td>
+                        <td class="path-cell" th:text="${log.requestUri}">/</td>
+                        <td>
+                            <span class="badge" th:classappend="${' risk-' + #strings.toLowerCase(log.riskLevel.name())}" th:text="${log.riskScore + ' / ' + log.riskLevel}">0 / LOW</span>
+                        </td>
+                        <td>
+                            <span class="badge" th:classappend="${' type-' + #strings.toLowerCase(log.trafficType.name())}" th:text="${log.trafficType}">NORMAL</span>
+                        </td>
+                        <td th:text="${log.source}">FRONTEND_COLLECT</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </article>
+
+        <aside class="panel ip-panel">
+            <h2>Suspicious IPs</h2>
+            <div class="ip-list">
+                <form class="ip-card" th:each="ip : ${topIps}" th:action="@{/admin/suspicious-ips/{id}/status(id=${ip.id})}" method="post">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                    <div>
+                        <strong th:text="${ip.ipAddress}">127.0.0.1</strong>
+                        <span th:text="${'max risk ' + ip.maxRiskScore + ' · suspicious ' + ip.suspiciousCount}">max risk 0</span>
+                    </div>
+                    <label>
+                        Status
+                        <select name="status">
+                            <option th:each="status : ${statuses}" th:value="${status}" th:text="${status}" th:selected="${status == ip.status}">WATCH</option>
+                        </select>
+                    </label>
+                    <label>
+                        Memo
+                        <input name="memo" th:value="${ip.memo}" placeholder="Decision notes">
+                    </label>
+                    <button type="submit">Save</button>
+                </form>
+                <p class="muted" th:if="${#lists.isEmpty(topIps)}">No suspicious IPs recorded yet.</p>
+            </div>
+        </aside>
+    </section>
+</main>
+</body>
+</html>

@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>ExposureWatch Login</title>
+    <link rel="stylesheet" th:href="@{/css/dashboard.css}">
+</head>
+<body class="login-page">
+<main class="login-panel">
+    <h1>ExposureWatch</h1>
+    <p>Admin dashboard</p>
+    <form th:action="@{/login}" method="post">
+        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+        <label>
+            Username
+            <input name="username" autocomplete="username" required>
+        </label>
+        <label>
+            Password
+            <input name="password" type="password" autocomplete="current-password" required>
+        </label>
+        <button type="submit">Sign in</button>
+    </form>
+    <p class="muted" th:if="${param.error}">Invalid username or password.</p>
+    <p class="muted" th:if="${param.logout}">You have signed out.</p>
+</main>
+</body>
+</html>
