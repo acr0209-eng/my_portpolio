@@ -26,7 +26,7 @@ function makeChart(id, type, dataMap, colors) {
     }
     const labels = Object.keys(dataMap);
     const values = Object.values(dataMap);
-    new Chart(element, {
+    new window.Chart(element, {
         type,
         data: {
             labels,
@@ -103,7 +103,7 @@ function connectLiveLogs() {
     }
 
     const protocol = window.location.protocol === "https:" ? "wss" : "ws";
-    const client = new StompJs.Client({
+    const client = new window.StompJs.Client({
         brokerURL: `${protocol}://${window.location.host}/ws`,
         reconnectDelay: 5000,
         onConnect: () => {

@@ -25,6 +25,7 @@ Vite `base`는 저장소명 기준인 `/my_portpolio/`를 사용합니다.
 - 요약
 - Markdown 본문과 미리보기
 - 대표 이미지 URL
+- 외부 글 URL
 - 태그
 - 공개/비공개
 - 작성일/수정일
@@ -84,19 +85,6 @@ npm run dev
 
 ```bash
 npm run build
-```
-
-## 프로젝트 추가 방법
-
-`src/data/projects.json`에 프로젝트 객체를 추가한 뒤 `main`에 push합니다.
-
-```json
-{
-  "id": 103,
-  "title": "새 프로젝트 제목",
-  "desc": "프로젝트 설명",
-  "url": "https://example.com"
-}
 ```
 
 ## ExposureWatch Backend

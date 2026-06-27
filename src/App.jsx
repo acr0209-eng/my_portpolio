@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import {
   addDoc,
@@ -17,9 +17,13 @@ import {
   signOut,
 } from 'firebase/auth';
 import './App.css';
+import heroImage from './assets/hero.png';
 import postsData from './data/posts.json';
-import projectsData from './data/projects.json';
 import { auth, db, isFirebaseConfigured, ownerUid } from './lib/firebase.js';
+
+const githubUrl = 'https://github.com/acr0209-eng';
+const tistoryUrl = 'https://uni0790.tistory.com';
+const emailAddress = 'uni0790@naver.com';
 
 const emptyDraft = {
   title: '',
@@ -28,9 +32,40 @@ const emptyDraft = {
   summary: '',
   body: '',
   coverImage: '',
+  externalUrl: '',
   tags: '',
   published: true,
 };
+
+const interests = [
+  'Infrastructure Security',
+  'Cloud Security',
+  'Network Security',
+  'Industrial Security',
+  'Insider Risk',
+];
+
+const learningItems = [
+  'C',
+  'Linux',
+  'Operating Systems',
+  'Network',
+  'Secure Coding',
+  'Web Security',
+];
+
+const experienceItems = [
+  {
+    title: '중앙대학교',
+    meta: '산업보안 전공',
+    description: '보안 기술, 조직, 정책, 데이터 분석을 함께 학습하며 보안 문제를 넓게 바라보는 관점을 쌓고 있습니다.',
+  },
+  {
+    title: '화이트햇 스쿨 4기',
+    meta: '보안 기초와 실무 역량 학습',
+    description: '시스템, 네트워크, 웹 보안의 기본기를 체계적으로 익히며 직접 실습하고 기록하는 교육 과정에 참여하고 있습니다.',
+  },
+];
 
 const slugify = (value) => value
   .trim()
@@ -57,6 +92,23 @@ const formatDate = (value) => {
   }).format(new Date(millis));
 };
 
+const isHttpUrl = (value) => {
+  try {
+    const url = new URL(value);
+    return url.protocol === 'http:' || url.protocol === 'https:';
+  } catch {
+    return false;
+  }
+};
+
+const isTistoryUrl = (value) => {
+  try {
+    return new URL(value).hostname.includes('tistory.com');
+  } catch {
+    return false;
+  }
+};
+
 const sortPosts = (items) => [...items].sort(
   (a, b) => getMillis(b.createdAt || b.updatedAt) - getMillis(a.createdAt || a.updatedAt),
 );
@@ -66,16 +118,13 @@ const legacyPosts = postsData.map((post) => ({
   id: `legacy-${post.id}`,
   category: 'TISTORY ARCHIVE',
   summary: post.desc,
-  sourceUrl: post.url,
+  externalUrl: post.url,
   isLegacy: true,
   published: true,
 }));
 
 function App() {
   const canvasRef = useRef(null);
-  const cursorDotRef = useRef(null);
-  const cursorOutlineRef = useRef(null);
-  const magneticRefs = useRef([]);
   const revealRefs = useRef([]);
 
   const [hash, setHash] = useState(window.location.hash || '#home');
@@ -93,9 +142,6 @@ function App() {
   const [saving, setSaving] = useState(false);
   const [statusMessage, setStatusMessage] = useState('');
 
-  const addMagnetic = (el) => {
-    if (el && !magneticRefs.current.includes(el)) magneticRefs.current.push(el);
-  };
   const addReveal = (el) => {
     if (el && !revealRefs.current.includes(el)) revealRefs.current.push(el);
   };
@@ -107,8 +153,21 @@ function App() {
   }, []);
 
   useEffect(() => {
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const observer = new IntersectionObserver(
+      (entries) => entries.forEach((entry) => entry.isIntersecting && entry.target.classList.add('visible')),
+      { threshold: 0.15 },
+    );
+    revealRefs.current.forEach((el) => {
+      if (prefersReducedMotion) el.classList.add('visible');
+      else observer.observe(el);
+    });
+
     const canvas = canvasRef.current;
-    if (!canvas) return undefined;
+    if (!canvas || prefersReducedMotion) {
+      return () => observer.disconnect();
+    }
+
     const ctx = canvas.getContext('2d');
     let particles = [];
     let frameId;
@@ -116,11 +175,11 @@ function App() {
     const resize = () => {
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
-      particles = Array.from({ length: 45 }, () => ({
+      particles = Array.from({ length: 34 }, () => ({
         x: Math.random() * canvas.width,
         y: Math.random() * canvas.height,
-        vx: Math.random() * 0.2 - 0.1,
-        vy: Math.random() * 0.2 - 0.1,
+        vx: Math.random() * 0.12 - 0.06,
+        vy: Math.random() * 0.12 - 0.06,
       }));
     };
 
@@ -133,65 +192,21 @@ function App() {
         else if (particle.x < 0) particle.x = canvas.width;
         if (particle.y > canvas.height) particle.y = 0;
         else if (particle.y < 0) particle.y = canvas.height;
-        ctx.fillStyle = 'rgba(255,255,255,0.12)';
+        ctx.fillStyle = 'rgba(59,130,246,0.16)';
         ctx.beginPath();
-        ctx.arc(particle.x, particle.y, 1.2, 0, Math.PI * 2);
+        ctx.arc(particle.x, particle.y, 1.15, 0, Math.PI * 2);
         ctx.fill();
       });
       frameId = requestAnimationFrame(draw);
     };
 
-    const move = (event) => {
-      const { clientX: x, clientY: y } = event;
-      if (cursorDotRef.current) {
-        cursorDotRef.current.style.left = `${x}px`;
-        cursorDotRef.current.style.top = `${y}px`;
-      }
-      if (cursorOutlineRef.current) {
-        cursorOutlineRef.current.style.left = `${x}px`;
-        cursorOutlineRef.current.style.top = `${y}px`;
-      }
-      magneticRefs.current.forEach((el) => {
-        if (!el?.isConnected) return;
-        const rect = el.getBoundingClientRect();
-        const dx = x - (rect.left + rect.width / 2);
-        const dy = y - (rect.top + rect.height / 2);
-        el.style.transform = Math.abs(dx) < 150 && Math.abs(dy) < 150
-          ? `translate(${dx * 0.15}px, ${dy * 0.15}px)`
-          : 'translate(0,0)';
-      });
-    };
-
-    const over = (event) => {
-      if (event.target.closest('a, button, .project-card, input, textarea, select')) {
-        document.body.classList.add('v-hovering');
-      }
-    };
-    const out = (event) => {
-      if (event.target.closest('a, button, .project-card, input, textarea, select')) {
-        document.body.classList.remove('v-hovering');
-      }
-    };
-
-    const observer = new IntersectionObserver(
-      (entries) => entries.forEach((entry) => entry.isIntersecting && entry.target.classList.add('visible')),
-      { threshold: 0.15 },
-    );
-    revealRefs.current.forEach((el) => observer.observe(el));
-
     resize();
     draw();
-    window.addEventListener('mousemove', move);
-    window.addEventListener('mouseover', over);
-    window.addEventListener('mouseout', out);
     window.addEventListener('resize', resize);
 
     return () => {
       cancelAnimationFrame(frameId);
       observer.disconnect();
-      window.removeEventListener('mousemove', move);
-      window.removeEventListener('mouseover', over);
-      window.removeEventListener('mouseout', out);
       window.removeEventListener('resize', resize);
     };
   }, []);
@@ -210,7 +225,7 @@ function App() {
         setFirebaseError('');
       },
       (error) => {
-        setFirebaseError(`글을 불러오지 못했습니다: ${error.message}`);
+        setFirebaseError(`글을 불러오지 못했습니다. ${error.message}`);
         setLoadingPosts(false);
       },
     );
@@ -285,6 +300,7 @@ function App() {
       summary: post.summary || '',
       body: post.body || '',
       coverImage: post.coverImage || '',
+      externalUrl: post.externalUrl || '',
       tags: Array.isArray(post.tags) ? post.tags.join(', ') : '',
       published: post.published !== false,
     });
@@ -294,9 +310,19 @@ function App() {
   const handleSave = async (event) => {
     event.preventDefault();
     if (!db || !user || user.uid !== ownerUid) return;
+
     const resolvedSlug = slugify(draft.slug || draft.title);
-    if (!draft.title.trim() || !resolvedSlug || !draft.summary.trim() || !draft.body.trim()) {
-      setStatusMessage('제목, slug, 요약, 본문을 모두 입력해 주세요.');
+    const externalUrl = draft.externalUrl.trim();
+    if (!draft.title.trim() || !draft.summary.trim() || !resolvedSlug) {
+      setStatusMessage('제목과 요약을 입력해 주세요. 제목으로 slug를 만들 수 없으면 slug도 입력해 주세요.');
+      return;
+    }
+    if (!externalUrl && !draft.body.trim()) {
+      setStatusMessage('외부 글 URL이 없으면 본문을 입력해 주세요.');
+      return;
+    }
+    if (externalUrl && !isHttpUrl(externalUrl)) {
+      setStatusMessage('외부 글 URL은 http:// 또는 https://로 시작해야 합니다.');
       return;
     }
 
@@ -309,6 +335,7 @@ function App() {
       summary: draft.summary.trim(),
       body: draft.body.trim(),
       coverImage: draft.coverImage.trim(),
+      externalUrl,
       tags: draft.tags.split(',').map((tag) => tag.trim()).filter(Boolean),
       published: Boolean(draft.published),
       ownerUid: user.uid,
@@ -334,7 +361,7 @@ function App() {
 
   const handleDelete = async (post) => {
     if (!db || !user || user.uid !== ownerUid) return;
-    if (!window.confirm(`“${post.title}” 글을 삭제할까요?`)) return;
+    if (!window.confirm(`"${post.title}" 글을 삭제할까요?`)) return;
     try {
       await deleteDoc(doc(db, 'posts', post.id));
       if (editingId === post.id) resetEditor();
@@ -347,8 +374,6 @@ function App() {
   const renderShell = (content) => (
     <>
       <div id="bg-grain" />
-      <div id="cursor-dot" ref={cursorDotRef} />
-      <div id="cursor-outline" ref={cursorOutlineRef} />
       <canvas id="bg-canvas" ref={canvasRef} />
       {content}
     </>
@@ -360,7 +385,7 @@ function App() {
         <header className="topbar">
           <div className="container nav">
             <a className="brand-link" href="#home">LEE JAE WON</a>
-            <a href="#writings">← BACK TO WRITINGS</a>
+            <a href="#writings">BACK TO WRITINGS</a>
           </div>
         </header>
         <main className="article-page container">
@@ -371,7 +396,9 @@ function App() {
             </div>
           ) : (
             <article className="article-card">
-              <div className="article-meta">{selectedPost.category || 'WRITING'} · {formatDate(selectedPost.createdAt)}</div>
+              <div className="article-meta">
+                {selectedPost.category || 'WRITING'} · {formatDate(selectedPost.createdAt || selectedPost.updatedAt)}
+              </div>
               <h1>{selectedPost.title}</h1>
               <p className="article-summary">{selectedPost.summary}</p>
               {selectedPost.coverImage && <img className="article-cover" src={selectedPost.coverImage} alt="" />}
@@ -399,7 +426,7 @@ function App() {
         </header>
         <main className="admin-page container">
           <h1>PORTFOLIO CMS</h1>
-          <p className="admin-intro">Firebase 계정으로 로그인한 관리자만 글을 작성·수정·삭제할 수 있습니다.</p>
+          <p className="admin-intro">Firebase 계정으로 로그인한 관리자만 글을 작성, 수정, 삭제할 수 있습니다.</p>
 
           {!isFirebaseConfigured || !ownerUid ? (
             <div className="setup-notice">
@@ -427,8 +454,9 @@ function App() {
                   <input className="log-input" placeholder="분류" value={draft.category} onChange={(event) => setDraft({ ...draft, category: event.target.value })} />
                   <textarea className="log-input cms-summary" placeholder="목록에 표시할 요약" value={draft.summary} onChange={(event) => setDraft({ ...draft, summary: event.target.value })} required />
                   <input className="log-input" placeholder="대표 이미지 URL (선택)" value={draft.coverImage} onChange={(event) => setDraft({ ...draft, coverImage: event.target.value })} />
+                  <input className="log-input" placeholder="외부 글 URL (선택) 예: https://uni0790.tistory.com/4" value={draft.externalUrl} onChange={(event) => setDraft({ ...draft, externalUrl: event.target.value })} />
                   <input className="log-input" placeholder="태그: 보안, 데이터, 프로젝트" value={draft.tags} onChange={(event) => setDraft({ ...draft, tags: event.target.value })} />
-                  <textarea className="log-input cms-body-input" placeholder="Markdown으로 본문을 작성하세요." value={draft.body} onChange={(event) => setDraft({ ...draft, body: event.target.value })} required />
+                  <textarea className="log-input cms-body-input" placeholder="Markdown으로 본문을 작성하세요." value={draft.body} onChange={(event) => setDraft({ ...draft, body: event.target.value })} required={!draft.externalUrl.trim()} />
                   <label className="publish-toggle">
                     <input type="checkbox" checked={draft.published} onChange={(event) => setDraft({ ...draft, published: event.target.checked })} />
                     공개 글로 게시
@@ -452,7 +480,9 @@ function App() {
                 ) : adminPosts.map((post) => (
                   <div className="manager-card" key={post.id}>
                     <div>
-                      <div className="manager-meta">{post.published ? 'PUBLIC' : 'PRIVATE'} · {post.category || 'WRITING'}</div>
+                      <div className="manager-meta">
+                        {post.published ? 'PUBLIC' : 'PRIVATE'} · {post.externalUrl ? 'EXTERNAL' : 'ARTICLE'} · {post.category || 'WRITING'}
+                      </div>
                       <h3>{post.title}</h3>
                       <p>{post.summary}</p>
                     </div>
@@ -476,86 +506,167 @@ function App() {
         <div className="container nav">
           <a className="brand-link" href="#home">LEE JAE WON</a>
           <div className="nav-links">
-            <a href="#about" ref={addMagnetic}>ABOUT</a>
-            <a href="#projects" ref={addMagnetic}>PROJECTS</a>
-            <a href="#writings" ref={addMagnetic}>WRITINGS</a>
-            <a href="#admin" ref={addMagnetic}>ADMIN</a>
+            <a href="#about">ABOUT</a>
+            <a href="#experience">EXPERIENCE</a>
+            <a href="#writings">WRITINGS</a>
+            <a href="#contact">CONTACT</a>
+            <a href="#admin">ADMIN</a>
           </div>
         </div>
       </header>
 
-      <section id="home" className="section hero">
-        <svg className="hero-lock-icon reveal-text" ref={addReveal} viewBox="0 0 24 24">
-          <path d="M12 17a2 2 0 100-4 2 2 0 000 4z" />
-          <path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zM9 6c0-1.66 1.34-3 3-3s3 1.34 3 3v2H9V6z" />
-        </svg>
-        <h1 className="reveal-text" ref={addReveal}>이재원</h1>
-        <div className="subtitle reveal-text" ref={addReveal}>CLOUD · NETWORK · INFRASTRUCTURE</div>
-        <div className="message reveal-text" ref={addReveal}>
-          인프라의 <span style={{ color: 'var(--accent)' }}>구조</span>가<br />
-          보안의 <span style={{ color: 'var(--accent)' }}>경로</span>를 결정한다.
-        </div>
-      </section>
-
-      <section id="about" className="section container">
-        <h2 className="section-label center-align reveal-text" ref={addReveal}>ABOUT</h2>
-        <div className="project-grid">
-          <div className="project-card magnetic-element" ref={addMagnetic}>
-            <div className="card-kicker">INFRASTRUCTURE</div><h3>Cloud & Network</h3><p>가상화 아키텍처 설계 및 트래픽 제어 최적화</p>
-          </div>
-          <div className="project-card magnetic-element" ref={addMagnetic}>
-            <div className="card-kicker">INTELLIGENCE</div><h3>AI-Driven Security</h3><p>데이터 분석을 활용한 지능형 이상 탐지 시스템</p>
-          </div>
-          <div className="project-card magnetic-element" ref={addMagnetic}>
-            <div className="card-kicker">EXPERIENCE</div><h3>Industrial Security</h3><p>중앙대학교 산업보안 전공 | 통합 보안 인프라 설계</p>
-          </div>
-        </div>
-      </section>
-
-      <section id="projects" className="section container">
-        <h2 className="section-label reveal-text" ref={addReveal}>SELECTED PROJECTS</h2>
-        <div className="project-grid">
-          {projectsData.map((project) => (
-            <div key={project.id} className="project-card magnetic-element" ref={addMagnetic}>
-              <h3>{project.title}</h3><p>{project.desc}</p>
-              {project.url && <a className="explore-btn" href={project.url} target="_blank" rel="noreferrer">EXPLORE →</a>}
+      <main>
+        <section id="home" className="section hero">
+          <div className="container hero-grid">
+            <div className="hero-copy reveal-text" ref={addReveal}>
+              <p className="eyebrow">Industrial Security Portfolio</p>
+              <h1>이재원</h1>
+              <p className="hero-subtitle">INDUSTRIAL SECURITY · WHITEHAT SCHOOL 4TH</p>
+              <p className="hero-profile">
+                중앙대학교 산업보안 전공<br />
+                화이트햇 스쿨 4기
+              </p>
+              <p className="hero-message">
+                기술과 조직의 맥락을 함께 이해하며<br />
+                실수하지 않는 보안 구조를 설계하는 과정을 기록합니다.
+              </p>
+              <div className="hero-actions">
+                <a className="btn-tesla" href="#writings">VIEW WRITINGS</a>
+                <a className="secondary-button" href={githubUrl} target="_blank" rel="noreferrer">GITHUB ↗</a>
+                <a className="secondary-button" href={tistoryUrl} target="_blank" rel="noreferrer">TISTORY ↗</a>
+              </div>
             </div>
-          ))}
-        </div>
-      </section>
+            <div className="hero-visual reveal-text" ref={addReveal} aria-hidden="true">
+              <img src={heroImage} alt="" />
+            </div>
+          </div>
+        </section>
 
-      <section id="writings" className="section container">
-        <div className="section-heading-row">
-          <h2 className="section-label reveal-text" ref={addReveal}>WRITINGS</h2>
-          <a className="write-link" href="#admin">WRITE / MANAGE</a>
-        </div>
-        {loadingPosts && <div className="empty-state">글을 불러오는 중입니다.</div>}
-        {firebaseError && <div className="setup-notice">{firebaseError}</div>}
-        <div className="project-grid">
-          {displayedPosts.map((post) => (
-            <article key={post.id} className="project-card writing-card magnetic-element" ref={addMagnetic}>
-              <div className="card-kicker">{post.category || 'WRITING'}</div>
-              <h3>{post.title}</h3>
-              <p>{post.summary || post.desc}</p>
-              {post.isLegacy ? (
-                <a className="explore-btn" href={post.sourceUrl} target="_blank" rel="noreferrer">READ ON TISTORY →</a>
-              ) : (
-                <a className="explore-btn" href={`#post/${encodeURIComponent(post.slug || post.id)}`}>READ ARTICLE →</a>
-              )}
+        <section id="about" className="section container">
+          <div className="section-heading-row">
+            <h2 className="section-label reveal-text" ref={addReveal}>ABOUT</h2>
+            <p className="section-note">보안 기술을 배우고, 글로 정리하고, 작은 프로젝트로 검증하는 포트폴리오입니다.</p>
+          </div>
+          <div className="about-layout">
+            <article className="profile-panel reveal-text" ref={addReveal}>
+              <p className="eyebrow">Profile</p>
+              <h3>기술과 조직 사이의 보안 문제를 배우고 있습니다.</h3>
+              <p>
+                중앙대학교에서 산업보안을 전공하며 인프라, 클라우드, 네트워크 보안에 관심을 두고 있습니다.
+                아직 완성된 전문가라기보다, 배운 내용을 직접 실습하고 기록하며 성장하는 과정에 있습니다.
+              </p>
+              <dl className="profile-facts">
+                <div>
+                  <dt>School</dt>
+                  <dd>중앙대학교 산업보안 전공</dd>
+                </div>
+                <div>
+                  <dt>Program</dt>
+                  <dd>화이트햇 스쿨 4기</dd>
+                </div>
+              </dl>
             </article>
-          ))}
-        </div>
-      </section>
+            <div className="stack-panel reveal-text" ref={addReveal}>
+              <div>
+                <p className="eyebrow">Interests</p>
+                <div className="pill-list">
+                  {interests.map((item) => <span key={item}>{item}</span>)}
+                </div>
+              </div>
+              <div>
+                <p className="eyebrow">Currently Learning</p>
+                <div className="pill-list">
+                  {learningItems.map((item) => <span key={item}>{item}</span>)}
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
 
-      <section className="section center-align philosophy-section">
-        <div className="container reveal-text" ref={addReveal}>
-          <div className="philosophy-small">좋은 보안은 막는 것이 아니라,</div>
-          <div className="philosophy-large">실수하지 않는 <span>구조</span>를 만드는 것이다.</div>
-        </div>
-      </section>
+        <section id="experience" className="section container">
+          <h2 className="section-label reveal-text" ref={addReveal}>EXPERIENCE</h2>
+          <div className="timeline-list">
+            {experienceItems.map((item) => (
+              <article className="timeline-item reveal-text" key={item.title} ref={addReveal}>
+                <div>
+                  <p className="timeline-meta">{item.meta}</p>
+                  <h3>{item.title}</h3>
+                </div>
+                <p>{item.description}</p>
+              </article>
+            ))}
+          </div>
+        </section>
+
+        <section id="writings" className="section container">
+          <div className="section-heading-row">
+            <div>
+              <h2 className="section-label reveal-text" ref={addReveal}>WRITINGS</h2>
+              <p className="section-note">학습 내용, 보안 사례 분석, 프로젝트 기록을 모아두는 공간입니다.</p>
+            </div>
+            <a className="write-link" href="#admin">WRITE / MANAGE</a>
+          </div>
+          {loadingPosts && <div className="empty-state">글을 불러오는 중입니다.</div>}
+          {firebaseError && <div className="setup-notice">{firebaseError}</div>}
+          <div className="writing-list">
+            {displayedPosts.map((post) => {
+              const externalUrl = post.externalUrl || '';
+              const postDate = formatDate(post.createdAt || post.updatedAt);
+              const label = externalUrl
+                ? isTistoryUrl(externalUrl) ? 'READ ON TISTORY →' : 'READ EXTERNAL →'
+                : 'READ ARTICLE →';
+              return (
+                <article
+                  key={post.id}
+                  className={`writing-card${externalUrl ? ' is-external' : ''}`}
+                  role={externalUrl ? 'link' : undefined}
+                  tabIndex={externalUrl ? 0 : undefined}
+                  onClick={externalUrl ? () => window.open(externalUrl, '_blank', 'noopener,noreferrer') : undefined}
+                  onKeyDown={externalUrl ? (event) => {
+                    if (event.key === 'Enter' || event.key === ' ') {
+                      event.preventDefault();
+                      window.open(externalUrl, '_blank', 'noopener,noreferrer');
+                    }
+                  } : undefined}
+                >
+                  <div className="writing-meta-row">
+                    <span>{post.category || 'WRITING'}</span>
+                    <span>{postDate || (post.isLegacy ? 'TISTORY' : 'ARTICLE')}</span>
+                    <span>{externalUrl ? 'EXTERNAL ↗' : 'INTERNAL →'}</span>
+                  </div>
+                  <div className="writing-main">
+                    <h3>{post.title}</h3>
+                    <p>{post.summary || post.desc}</p>
+                    {post.tags?.length > 0 && (
+                      <div className="tag-list">{post.tags.map((tag) => <span key={tag}>#{tag}</span>)}</div>
+                    )}
+                  </div>
+                  {externalUrl ? (
+                    <a className="explore-btn" href={externalUrl} target="_blank" rel="noreferrer" onClick={(event) => event.stopPropagation()}>{label}</a>
+                  ) : (
+                    <a className="explore-btn" href={`#post/${encodeURIComponent(post.slug || post.id)}`}>{label}</a>
+                  )}
+                </article>
+              );
+            })}
+          </div>
+        </section>
+
+        <section id="contact" className="section contact-section">
+          <div className="container contact-panel reveal-text" ref={addReveal}>
+            <p className="eyebrow">Let's Connect</p>
+            <h2>보안과 인프라에 관한 학습과 기록을 꾸준히 이어가고 있습니다.</h2>
+            <a className="contact-email" href={`mailto:${emailAddress}`}>{emailAddress}</a>
+            <div className="contact-links">
+              <a href={`mailto:${emailAddress}`}>EMAIL</a>
+              <a href={githubUrl} target="_blank" rel="noreferrer">GITHUB ↗</a>
+              <a href={tistoryUrl} target="_blank" rel="noreferrer">TISTORY ↗</a>
+            </div>
+          </div>
+        </section>
+      </main>
 
       <footer>
-        인프라의 구조로 보안의 경로를 설계합니다.<br />
         <span>© 2026 JAEWON LEE. ALL RIGHTS RESERVED.</span>
       </footer>
     </>,
