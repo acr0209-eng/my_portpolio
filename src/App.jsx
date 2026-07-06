@@ -63,7 +63,7 @@ const experienceItems = [
   {
     title: '화이트햇 스쿨 4기',
     meta: '보안 기초와 실무 역량 학습',
-    description: '시스템, 네트워크, 웹 보안의 기본기를 체계적으로 익히며 직접 실습하고 기록하는 교육 과정에 참여하고 있습니다.',
+    description: '시스템, 네트워크, 웹 보안의 기본기를 익히며 직접 실습하고 기록하는 교육 과정에 참여하고 있습니다.',
   },
 ];
 
@@ -153,22 +153,29 @@ function App() {
   }, []);
 
   useEffect(() => {
-    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const observer = new IntersectionObserver(
-      (entries) => entries.forEach((entry) => entry.isIntersecting && entry.target.classList.add('visible')),
-      { threshold: 0.15 },
-    );
+    const prefersReducedMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
+    const observer = typeof IntersectionObserver === 'function' && !prefersReducedMotion
+      ? new IntersectionObserver(
+        (entries) => entries.forEach((entry) => entry.isIntersecting && entry.target.classList.add('visible')),
+        { threshold: 0.15 },
+      )
+      : null;
+
     revealRefs.current.forEach((el) => {
-      if (prefersReducedMotion) el.classList.add('visible');
+      if (prefersReducedMotion || !observer) el.classList.add('visible');
       else observer.observe(el);
     });
 
     const canvas = canvasRef.current;
     if (!canvas || prefersReducedMotion) {
-      return () => observer.disconnect();
+      return () => observer?.disconnect();
     }
 
     const ctx = canvas.getContext('2d');
+    if (!ctx) {
+      return () => observer?.disconnect();
+    }
+
     let particles = [];
     let frameId;
 
@@ -206,7 +213,7 @@ function App() {
 
     return () => {
       cancelAnimationFrame(frameId);
-      observer.disconnect();
+      observer?.disconnect();
       window.removeEventListener('resize', resize);
     };
   }, []);
@@ -262,6 +269,7 @@ function App() {
 
   const displayedPosts = useMemo(() => [...publicPosts, ...legacyPosts], [publicPosts]);
   const isAdminRoute = hash === '#admin';
+  const canUseAdmin = isFirebaseConfigured && Boolean(ownerUid);
   const postSlug = hash.startsWith('#post/') ? decodeURIComponent(hash.slice(6)) : null;
   const selectedPost = postSlug
     ? publicPosts.find((post) => post.slug === postSlug || post.id === postSlug)
@@ -428,17 +436,20 @@ function App() {
           <h1>PORTFOLIO CMS</h1>
           <p className="admin-intro">Firebase 계정으로 로그인한 관리자만 글을 작성, 수정, 삭제할 수 있습니다.</p>
 
-          {!isFirebaseConfigured || !ownerUid ? (
-            <div className="setup-notice">
+          {!canUseAdmin && (
+            <div className="setup-notice" id="firebaseSetupHelp">
               Firebase 설정이 아직 비어 있습니다. <code>.env</code>에 Firebase Web App 값과 관리자 UID를 입력해 주세요.
             </div>
-          ) : authLoading ? (
+          )}
+
+          {canUseAdmin && authLoading ? (
             <div className="empty-state">로그인 상태를 확인하는 중입니다.</div>
           ) : !user ? (
-            <form className="admin-login" onSubmit={handleLogin}>
-              <input className="log-input" type="email" placeholder="관리자 이메일" value={email} onChange={(event) => setEmail(event.target.value)} required />
-              <input className="log-input" type="password" placeholder="비밀번호" value={password} onChange={(event) => setPassword(event.target.value)} required />
-              <button className="btn-tesla" type="submit">LOGIN</button>
+            <form className="admin-login" onSubmit={handleLogin} aria-describedby={!canUseAdmin ? 'firebaseSetupHelp' : undefined}>
+              <input className="log-input" type="email" placeholder="관리자 이메일" value={email} onChange={(event) => setEmail(event.target.value)} disabled={!canUseAdmin} required />
+              <input className="log-input" type="password" placeholder="비밀번호" value={password} onChange={(event) => setPassword(event.target.value)} disabled={!canUseAdmin} required />
+              <button className="btn-tesla" type="submit" disabled={!canUseAdmin}>LOGIN</button>
+              {!canUseAdmin && <p className="form-error">Firebase 설정을 추가한 뒤 로그인할 수 있습니다.</p>}
               {authError && <p className="form-error">{authError}</p>}
             </form>
           ) : (
@@ -521,10 +532,10 @@ function App() {
             <div className="hero-copy reveal-text" ref={addReveal}>
               <p className="eyebrow">Industrial Security Portfolio</p>
               <h1>이재원</h1>
-              <p className="hero-subtitle">INDUSTRIAL SECURITY · WHITEHAT SCHOOL 4TH</p>
+              <p className="hero-subtitle">INDUSTRIAL SECURITY · SECURITY PORTFOLIO</p>
               <p className="hero-profile">
                 중앙대학교 산업보안 전공<br />
-                화이트햇 스쿨 4기
+                보안 학습과 프로젝트 기록
               </p>
               <p className="hero-message">
                 기술과 조직의 맥락을 함께 이해하며<br />
@@ -561,8 +572,8 @@ function App() {
                   <dd>중앙대학교 산업보안 전공</dd>
                 </div>
                 <div>
-                  <dt>Program</dt>
-                  <dd>화이트햇 스쿨 4기</dd>
+                  <dt>Focus</dt>
+                  <dd>보안 실습 및 프로젝트 기록</dd>
                 </div>
               </dl>
             </article>
