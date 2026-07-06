@@ -23,7 +23,6 @@ import { auth, db, isFirebaseConfigured, ownerUid } from './lib/firebase.js';
 
 const githubUrl = 'https://github.com/acr0209-eng';
 const tistoryUrl = 'https://uni0790.tistory.com';
-const emailAddress = 'uni0790@naver.com';
 
 const emptyDraft = {
   title: '',
@@ -520,7 +519,6 @@ function App() {
             <a href="#about">ABOUT</a>
             <a href="#experience">EXPERIENCE</a>
             <a href="#writings">WRITINGS</a>
-            <a href="#contact">CONTACT</a>
             <a href="#admin">ADMIN</a>
           </div>
         </div>
@@ -663,18 +661,6 @@ function App() {
           </div>
         </section>
 
-        <section id="contact" className="section contact-section">
-          <div className="container contact-panel reveal-text" ref={addReveal}>
-            <p className="eyebrow">Let's Connect</p>
-            <h2>보안과 인프라에 관한 학습과 기록을 꾸준히 이어가고 있습니다.</h2>
-            <a className="contact-email" href={`mailto:${emailAddress}`}>{emailAddress}</a>
-            <div className="contact-links">
-              <a href={`mailto:${emailAddress}`}>EMAIL</a>
-              <a href={githubUrl} target="_blank" rel="noreferrer">GITHUB ↗</a>
-              <a href={tistoryUrl} target="_blank" rel="noreferrer">TISTORY ↗</a>
-            </div>
-          </div>
-        </section>
       </main>
 
       <footer>

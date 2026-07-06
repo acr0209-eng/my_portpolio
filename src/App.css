@@ -328,8 +328,7 @@ select:focus-visible,
   padding: 32px;
 }
 
-.profile-panel h3,
-.contact-panel h2 {
+.profile-panel h3 {
   margin: 12px 0 18px;
   font-size: 2rem;
   line-height: 1.25;
@@ -483,52 +482,6 @@ select:focus-visible,
 
 .writing-main .tag-list {
   margin-top: 16px;
-}
-
-.contact-section {
-  border-bottom: 0;
-}
-
-.contact-panel {
-  padding: 42px;
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
-  background: var(--surface-strong);
-}
-
-.contact-email {
-  display: inline-block;
-  max-width: 100%;
-  margin-top: 8px;
-  color: var(--text);
-  font-size: 1.65rem;
-  font-weight: 850;
-  overflow-wrap: anywhere;
-}
-
-.contact-links {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-  margin-top: 28px;
-}
-
-.contact-links a {
-  min-height: 42px;
-  display: inline-flex;
-  align-items: center;
-  border: 1px solid var(--line-strong);
-  border-radius: 999px;
-  padding: 10px 16px;
-  color: var(--soft);
-  font-size: 0.78rem;
-  font-weight: 850;
-  letter-spacing: 0.08em;
-}
-
-.contact-links a:hover {
-  color: var(--text);
-  border-color: var(--accent);
 }
 
 footer {
@@ -792,37 +745,29 @@ footer {
     font-size: 1.28rem;
   }
 
-  .hero-actions,
-  .contact-links {
+  .hero-actions {
     width: 100%;
   }
 
-  .hero-actions a,
-  .contact-links a {
+  .hero-actions a {
     flex: 1 1 100%;
   }
 
   .profile-panel,
   .stack-panel,
-  .contact-panel,
   .editor-panel,
   .post-manager,
   .writing-card {
     padding: 22px;
   }
 
-  .profile-panel h3,
-  .contact-panel h2 {
+  .profile-panel h3 {
     font-size: 1.6rem;
   }
 
   .profile-facts div {
     grid-template-columns: 1fr;
     gap: 4px;
-  }
-
-  .contact-email {
-    font-size: 1.25rem;
   }
 
   .article-card h1,
