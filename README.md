@@ -4,8 +4,27 @@ React + Vite 기반 포트폴리오 사이트입니다.
 
 - 배포: GitHub Pages
 - 글 CMS: Firebase Authentication + Cloud Firestore
-- 기존 Tistory 글: `src/data/posts.json`에서 외부 아카이브로 계속 표시
+- Notion 대표 작업: `src/data/posts.json`에서 내부 케이스 스터디로 표시
+- Notion 전체 학습 지도: `src/data/knowledge.json`에서 도메인·기록 형식별로 표시
 - 방문자 모니터링 실험: `exposurewatch-backend`
+
+## 콘텐츠 구조
+
+Notion에서 가져온 콘텐츠는 방문자가 탐색하기 쉽도록 두 층으로 나눕니다.
+
+- **Selected Work**: 공개 프로젝트·분석·실습 6개를 사이트 안에서 읽을 수 있는 상세 글로 제공
+- **Knowledge Atlas**: 주요 Notion 기록 73개를 6개 보안 도메인과 6개 기록 형식으로 분류
+
+Knowledge Atlas 도메인:
+
+- Cloud, IAM & DevSecOps
+- Governance & Human Risk
+- Incident Response & CTI
+- Web & Application Security
+- Systems & Network
+- Container & Cloud Native
+
+기록 형식은 `PROJECT`, `REPORT`, `LAB`, `ANALYSIS`, `STUDY`, `REFERENCE`를 사용합니다.
 
 ## 자동 배포
 

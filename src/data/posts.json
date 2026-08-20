@@ -1,26 +1,75 @@
 [
   {
-    "id": 201,
-    "title": "기업경영과 보안",
-    "url": "https://uni0790.tistory.com/1",
-    "desc": "기업 의사결정, 보안 거버넌스, 내부통제 관점에서 정리한 기록"
-  },
-  {
-    "id": 202,
-    "title": "삼성바이오로직스 영업비밀 유출 사건 분석",
-    "url": "https://uni0790.tistory.com/2",
-    "desc": "내부자 위협, SOP 자산 가치, 제로 트러스트 관점에서 산업보안 의사결정 포인트를 정리한 분석 기록"
-  },
-  {
-    "id": 203,
+    "id": "security-ui",
+    "slug": "human-centered-security-ui",
     "title": "인간공학적 보안 UI 개선 프로젝트",
-    "url": "https://uni0790.tistory.com/3",
-    "desc": "업무 상황에서 보안 우회 행동을 줄이기 위해 수정 전후 UI를 비교하고 설문으로 검증한 프로젝트 기록"
+    "category": "프로젝트",
+    "summary": "업무 상황에서 보안 우회 행동을 줄이기 위해 수정 전후 UI를 비교하고 설문으로 검증한 프로젝트입니다.",
+    "date": "2026-07-26",
+    "sourceUrl": "https://uni0790.tistory.com/3",
+    "notionUrl": "https://app.notion.com/p/3a93f93e21d58101ae71e6e70193b5f4",
+    "tags": ["보안 UI", "인간공학", "산업보안"],
+    "featured": true,
+    "body": "## 프로젝트 개요\n\n업무 상황에서 보안 우회 행동을 줄이기 위해 수정 전후 UI를 비교하고 설문으로 검증한 프로젝트입니다.\n\n## 문제 정의\n\n보안 절차가 복잡하거나 업무 흐름을 방해하면 사용자는 우회 행동을 선택할 수 있습니다. 따라서 보안 강도뿐 아니라 사용성과 인지 부담도 함께 고려해야 합니다.\n\n## 접근 방식\n\n- 기존 UI의 불편 요소 파악\n- 보안 절차를 이해하기 쉬운 흐름으로 재설계\n- 수정 전후 UI 비교\n- 설문을 통해 사용성 및 보안 인식 변화 확인\n\n보안은 사용자를 통제하는 장치만으로 완성되지 않습니다. 사용자가 맥락을 이해하고 자연스럽게 안전한 선택을 할 수 있도록 만드는 것도 보안 설계의 일부입니다."
   },
   {
-    "id": 204,
+    "id": "trade-secret-case",
+    "slug": "samsung-biologics-trade-secret-case",
+    "title": "삼성바이오로직스 영업비밀 유출 사건 분석",
+    "category": "보안 분석",
+    "summary": "내부자 위협, SOP 자산 가치, 제로 트러스트 관점에서 산업보안 의사결정 포인트를 정리했습니다.",
+    "date": "2026-07-26",
+    "sourceUrl": "https://uni0790.tistory.com/2",
+    "notionUrl": "https://app.notion.com/p/3a93f93e21d58163ac60ee5c2987ecb3",
+    "tags": ["산업보안", "내부자 위협", "제로 트러스트"],
+    "body": "## 개요\n\n내부자 위협, SOP 자산 가치, 제로 트러스트 관점에서 산업보안 의사결정 포인트를 정리한 분석 기록입니다.\n\n## 핵심 관점\n\n- 영업비밀은 문서 자체뿐 아니라 업무 절차와 운영 노하우까지 포함될 수 있습니다.\n- 내부자 위협은 권한 보유자가 정상 업무를 가장해 정보를 가져갈 수 있다는 점에서 탐지가 어렵습니다.\n- 최소 권한, 지속적 검증, 중요 자료 접근 기록이 필요합니다.\n\n산업보안은 기술 통제만으로 설명하기 어렵습니다. 자산의 가치와 업무 맥락, 권한 구조를 함께 읽어야 현실적인 통제 지점을 찾을 수 있습니다."
+  },
+  {
+    "id": "redos-lab",
+    "slug": "redos-vulnerability-lab",
+    "title": "취약점 구현(ReDoS)",
+    "category": "보안 분석",
+    "summary": "정규표현식 서비스 거부 공격의 동작 원리와 취약한 패턴을 직접 구현하며 분석한 실습 보고서입니다.",
+    "date": "2026-07-13",
+    "sourceUrl": "https://uni0790.tistory.com/5",
+    "notionUrl": "https://app.notion.com/p/3a93f93e21d581b182f7fce5c7735640",
+    "tags": ["웹 보안", "ReDoS"],
+    "body": "## 개요\n\n정규표현식 서비스 거부 공격(ReDoS)의 동작 원리와 취약한 패턴을 직접 구현하며 분석한 보안 실습 보고서입니다.\n\n## 핵심 내용\n\n- ReDoS와 정규표현식 백트래킹 이해\n- 취약한 정규표현식 패턴 구현\n- 입력 길이에 따른 처리시간 증가 확인\n- CVE 재현 과정과 방어 방법 정리\n\n취약점의 이름을 외우는 데서 멈추지 않고, 입력 변화가 처리 시간에 어떤 영향을 주는지 직접 확인하며 공격 조건과 방어 원리를 연결했습니다."
+  },
+  {
+    "id": "tcp-socket-lab",
+    "slug": "python-tcp-socket-lab",
     "title": "TCP 소켓 통신 실습 기록",
-    "url": "https://uni0790.tistory.com/4",
-    "desc": "Python TCP 서버와 클라이언트를 직접 실행하며 소켓 연결, 메시지 송수신, 터미널 실습 흐름을 정리한 기록"
+    "category": "학습 기록",
+    "summary": "Python TCP 서버와 클라이언트를 직접 실행하며 소켓 연결과 메시지 송수신 흐름을 정리했습니다.",
+    "date": "2026-07-26",
+    "sourceUrl": "https://uni0790.tistory.com/4",
+    "notionUrl": "https://app.notion.com/p/3a93f93e21d581a2bf80cc685ef8f2aa",
+    "tags": ["네트워크", "Python"],
+    "body": "## 실습 개요\n\nPython TCP 서버와 클라이언트를 직접 실행하며 소켓 연결, 메시지 송수신, 터미널 실습 흐름을 정리한 기록입니다.\n\n## 학습 내용\n\n- 서버 소켓 생성과 바인딩\n- 연결 대기와 클라이언트 접속\n- 메시지 송수신\n- 연결 종료 처리\n- 터미널에서 서버와 클라이언트를 각각 실행하는 흐름\n\n## 핵심 이해\n\nTCP는 연결 지향형 프로토콜이며, 서버는 먼저 포트를 열고 대기한 뒤 클라이언트의 연결 요청을 받아 통신합니다."
+  },
+  {
+    "id": "naver-search-api",
+    "slug": "naver-search-api-python",
+    "title": "네이버 검색 API 연동부터 실행까지",
+    "category": "학습 기록",
+    "summary": "네이버 블로그 검색 API를 활용해 파이썬 키워드 검색 프로그램을 구현한 실습 기록입니다.",
+    "date": "2026-07-25",
+    "sourceUrl": "https://uni0790.tistory.com/6",
+    "notionUrl": "https://app.notion.com/p/3a93f93e21d5816fa57ce581f26ef334",
+    "tags": ["Python", "API", "네이버"],
+    "body": "## 개요\n\n네이버 블로그 검색 API를 연동하고 Python으로 키워드 검색 프로그램을 실행한 실습 기록입니다.\n\n## 핵심 내용\n\n- 네이버 개발자 애플리케이션 등록\n- Client ID와 Client Secret을 환경에 적용\n- 검색어를 입력받아 블로그 검색 API 호출\n- JSON 응답에서 제목·링크·설명 추출\n- 실행 오류를 수정하고 결과 확인\n\nAPI 자격 증명을 코드와 분리하고, 요청부터 응답 파싱까지의 전체 흐름을 직접 연결했습니다."
+  },
+  {
+    "id": "business-security",
+    "slug": "business-and-security",
+    "title": "기업경영과 보안",
+    "category": "에세이",
+    "summary": "기업 의사결정, 보안 거버넌스, 내부통제 관점에서 보안의 역할을 정리했습니다.",
+    "date": "2026-07-26",
+    "sourceUrl": "https://uni0790.tistory.com/1",
+    "notionUrl": "https://app.notion.com/p/3a93f93e21d58185bcbaccdc754e9fa0",
+    "tags": ["산업보안", "거버넌스"],
+    "body": "## 개요\n\n기업 의사결정, 보안 거버넌스, 내부통제 관점에서 정리한 기록입니다.\n\n## 핵심 관점\n\n- 보안은 기술 부서만의 문제가 아니라 경영 의사결정의 일부입니다.\n- 조직의 자산, 위험, 책임 구조를 함께 고려해야 합니다.\n- 내부통제와 보안 거버넌스는 사고 예방뿐 아니라 대응 책임을 명확히 하는 데 중요합니다.\n\n좋은 보안은 위험을 설명할 수 있어야 하고, 조직이 실행 가능한 의사결정으로 이어져야 합니다."
   }
 ]

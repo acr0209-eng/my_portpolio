@@ -1,0 +1,476 @@
+{
+  "updatedAt": "2026-08-21",
+  "source": "Notion workspace inventory",
+  "totalItems": 73,
+  "contentTypes": [
+    "PROJECT",
+    "REPORT",
+    "LAB",
+    "ANALYSIS",
+    "STUDY",
+    "REFERENCE"
+  ],
+  "domains": [
+    {
+      "id": "cloud-iam-devsecops",
+      "number": "01",
+      "title": "Cloud, IAM & DevSecOps",
+      "korean": "클라우드·권한·보안 자동화",
+      "description": "AWS 공유책임 모델에서 IAM 최소권한, Terraform 기반 IaC, SecOps 도구 선정과 CI 보안 게이트까지 연결합니다.",
+      "keywords": [
+        "AWS",
+        "IAM",
+        "Terraform",
+        "SecOps",
+        "CI/CD"
+      ],
+      "items": [
+        {
+          "title": "보고서 · 근두운 IAM 협업 구조 현황 및 개선안",
+          "type": "REPORT",
+          "date": "2026-08-18"
+        },
+        {
+          "title": "실습 · Terraform IAM 관리 시스템 구축",
+          "type": "LAB",
+          "date": "2026-08-17"
+        },
+        {
+          "title": "참고 · IAM 권한 안전 위임 — Permissions Boundary + Terraform PR",
+          "type": "REFERENCE",
+          "date": "2026-08-17"
+        },
+        {
+          "title": "실습 · 근두운 IAM 관리 시스템 설계 — Boundary + PassRole",
+          "type": "LAB",
+          "date": "2026-08-17"
+        },
+        {
+          "title": "참고 · Terraform HCL 첫 이해와 Bootstrap 구조",
+          "type": "REFERENCE",
+          "date": "2026-08-17"
+        },
+        {
+          "title": "근두운 1차 프로젝트 보고서",
+          "type": "PROJECT",
+          "date": "2026-08-16"
+        },
+        {
+          "title": "화이트햇프로젝트: 클라우드 인프라 침해 사고 대응 및 SecOps 인프라 구축",
+          "type": "PROJECT",
+          "date": "2026-08-16"
+        },
+        {
+          "title": "8/16 IAM 권한 제공 패턴 조사 및 실습",
+          "type": "LAB",
+          "date": "2026-08-16"
+        },
+        {
+          "title": "8/16 Cloudflare · AWS WAF · Shield 비용 및 적용안",
+          "type": "STUDY",
+          "date": "2026-08-16"
+        },
+        {
+          "title": "NO.76 클라우드 SecOps 도구 선정 및 구축 방향",
+          "type": "STUDY",
+          "date": "2026-08-11"
+        },
+        {
+          "title": "02 · Ansible SSH 보안 강화 · Terraform 기초",
+          "type": "STUDY",
+          "date": "2026-08-09"
+        },
+        {
+          "title": "AWS 보안 입문 · 10~12강",
+          "type": "STUDY",
+          "date": "2026-08-06"
+        },
+        {
+          "title": "AWS 보안 입문 · 01~03강",
+          "type": "STUDY",
+          "date": "2026-08-06"
+        },
+        {
+          "title": "AWS 보안 입문 · 04~06강",
+          "type": "STUDY",
+          "date": "2026-08-06"
+        },
+        {
+          "title": "AWS 보안 입문 · 07~09강",
+          "type": "STUDY",
+          "date": "2026-08-06"
+        },
+        {
+          "title": "NO.76 IaC 도구 스택 조사",
+          "type": "STUDY",
+          "date": "2026-08-06"
+        },
+        {
+          "title": "03 · DevSecOps Lifecycle · AWS Security Automation",
+          "type": "STUDY",
+          "date": "2026-08-05"
+        },
+        {
+          "title": "04 · OWASP Dependency-Check · AWS CI/CD",
+          "type": "STUDY",
+          "date": "2026-08-05"
+        },
+        {
+          "title": "03 · IaC · Architecture · MSA",
+          "type": "STUDY",
+          "date": "2026-08-05"
+        }
+      ]
+    },
+    {
+      "id": "governance-human",
+      "number": "02",
+      "title": "Governance & Human Risk",
+      "korean": "거버넌스·컴플라이언스·사람",
+      "description": "보안 책임성과 비즈니스 연계, ISMS-P, 위험관리, 개인정보보호와 사용자 행동을 함께 다룹니다.",
+      "keywords": [
+        "Governance",
+        "ISMS-P",
+        "Risk",
+        "Privacy",
+        "Human Factors"
+      ],
+      "items": [
+        {
+          "title": "ISMS-P · 07 · 클라우드 실무 · IAM · KMS · Keycloak",
+          "type": "STUDY",
+          "date": "2026-08-17"
+        },
+        {
+          "title": "ISMS-P · 02 · 자산 · 위험관리 · 운영 · 클라우드 자산관리",
+          "type": "STUDY",
+          "date": "2026-08-17"
+        },
+        {
+          "title": "ISMS-P · 05 · 시스템 도입 · 개발 · 운영 보안",
+          "type": "STUDY",
+          "date": "2026-08-17"
+        },
+        {
+          "title": "ISMS-P · 01 · 인증제도 · 심사 · 관리체계 수립",
+          "type": "STUDY",
+          "date": "2026-08-17"
+        },
+        {
+          "title": "ISMS-P · 08 · 네트워크 · CloudTrail · Inspector",
+          "type": "STUDY",
+          "date": "2026-08-17"
+        },
+        {
+          "title": "ISMS-P · 04 · 인증 · 권한 · 네트워크 보안",
+          "type": "STUDY",
+          "date": "2026-08-17"
+        },
+        {
+          "title": "정보보안 거버넌스 · 07 · 보안사고 · 업무연속성 · 재해복구",
+          "type": "STUDY",
+          "date": "2026-08-17"
+        },
+        {
+          "title": "정보보안 거버넌스 · 08 · 모니터링 · 감사 · 로깅 · 성과측정",
+          "type": "STUDY",
+          "date": "2026-08-17"
+        },
+        {
+          "title": "정보보안 거버넌스 · 06 · 물리보안 · 시스템개발 · 접근제어",
+          "type": "STUDY",
+          "date": "2026-08-17"
+        },
+        {
+          "title": "정보보안 거버넌스 · 04 · 기업 관리체계 · 거버넌스 · 위험관리",
+          "type": "STUDY",
+          "date": "2026-08-17"
+        },
+        {
+          "title": "정보보안 거버넌스 · 05 · 보안정책 · 인적자원 · 정보관리",
+          "type": "STUDY",
+          "date": "2026-08-17"
+        },
+        {
+          "title": "ISMS-P · 03 · 정책 · 인사 · 외부자 · 물리보안",
+          "type": "STUDY",
+          "date": "2026-08-17"
+        },
+        {
+          "title": "ISMS-P · 10 · 제공 · 위탁 · 파기 · 정보주체 권리",
+          "type": "STUDY",
+          "date": "2026-08-17"
+        },
+        {
+          "title": "ISMS-P · 09 · 개인정보 수집 · 동의 · 현황 · 마스킹",
+          "type": "STUDY",
+          "date": "2026-08-17"
+        },
+        {
+          "title": "정보보안 거버넌스 · 02 · 관리 시스템 · ISO 6원칙",
+          "type": "STUDY",
+          "date": "2026-08-14"
+        },
+        {
+          "title": "정보보안 거버넌스 · 01 · 개념 · 필요성 · 목표",
+          "type": "STUDY",
+          "date": "2026-08-14"
+        },
+        {
+          "title": "정보보안 거버넌스 · 03 · 구성 요소 · 농협 사례 · 총정리",
+          "type": "STUDY",
+          "date": "2026-08-14"
+        },
+        {
+          "title": "개인정보보호법·AI·컨설팅 역량",
+          "type": "STUDY",
+          "date": "2026-08-09"
+        },
+        {
+          "title": "정보보호 컨설팅 · 개인정보보호법·AI·컨설팅 역량",
+          "type": "STUDY",
+          "date": "2026-08-08"
+        },
+        {
+          "title": "정보보호 컨설팅 · 01~02차시 · 개념·역량·프로세스",
+          "type": "STUDY",
+          "date": "2026-08-06"
+        },
+        {
+          "title": "정보보호 컨설팅 · 위험관리·개인정보보호",
+          "type": "STUDY",
+          "date": "2026-08-06"
+        },
+        {
+          "title": "삼성바이오로직스 영업비밀 유출 사건 분석",
+          "type": "ANALYSIS",
+          "date": "2026-07-26"
+        },
+        {
+          "title": "기업경영과 보안",
+          "type": "STUDY",
+          "date": "2026-07-26"
+        },
+        {
+          "title": "인간공학적 보안 UI 개선 프로젝트",
+          "type": "PROJECT",
+          "date": "2026-07-26"
+        }
+      ]
+    },
+    {
+      "id": "incident-cti",
+      "number": "03",
+      "title": "Incident Response & CTI",
+      "korean": "침해사고 대응·위협 인텔리전스",
+      "description": "온프레미스와 클라우드 사고 유형, IOC·TTP, OSINT와 CTI 수집·분석 흐름을 정리합니다.",
+      "keywords": [
+        "IR",
+        "CTI",
+        "OSINT",
+        "TTP",
+        "Detection"
+      ],
+      "items": [
+        {
+          "title": "침해사고 대응 · On-Premise · Cloud · 주요 공격 유형",
+          "type": "STUDY",
+          "date": "2026-08-20"
+        },
+        {
+          "title": "침해사고 대응 · 03강 · 대응 프레임워크 · TTP · 시간 지표",
+          "type": "STUDY",
+          "date": "2026-08-19"
+        },
+        {
+          "title": "침해사고 대응 · 01~02강 · 기본 개념 · 유형 · 역사",
+          "type": "STUDY",
+          "date": "2026-08-19"
+        },
+        {
+          "title": "01 · 사이버 범죄 이해 · CTI · 위협 모니터링",
+          "type": "STUDY",
+          "date": "2026-08-19"
+        },
+        {
+          "title": "02 · OSINT · CTI · 사이버 위협 인텔리전스",
+          "type": "STUDY",
+          "date": "2026-08-19"
+        },
+        {
+          "title": "실습 · Telegram 기반 CTI 분석 보고서",
+          "type": "REPORT",
+          "date": "2026-08-19"
+        },
+        {
+          "title": "공통 과제 · GitHub Actions SecOps CI 실습",
+          "type": "LAB",
+          "date": "2026-08-18"
+        },
+        {
+          "title": "보고서 · GitHub Actions SecOps CI 파이프라인 구축 실습",
+          "type": "REPORT",
+          "date": "2026-08-18"
+        },
+        {
+          "title": "ISMS-P · 06 · 침해사고 · 재해 · AWS 네이티브",
+          "type": "STUDY",
+          "date": "2026-08-17"
+        },
+        {
+          "title": "05 · OSINT · API · Exposure Analysis",
+          "type": "STUDY",
+          "date": "2026-08-05"
+        }
+      ]
+    },
+    {
+      "id": "web-application",
+      "number": "04",
+      "title": "Web & Application Security",
+      "korean": "웹 개발·애플리케이션 보안",
+      "description": "Node.js와 Express의 요청 처리 구조부터 ReDoS, Prototype Pollution, API 보안 실습까지 이어집니다.",
+      "keywords": [
+        "Node.js",
+        "Express",
+        "ReDoS",
+        "API",
+        "Secure Coding"
+      ],
+      "items": [
+        {
+          "title": "05 · JavaScript Prototype · Prototype Pollution · EJS RCE",
+          "type": "STUDY",
+          "date": "2026-08-13"
+        },
+        {
+          "title": "04 · Express.js 미들웨어 · EJS · Node.js 심화",
+          "type": "STUDY",
+          "date": "2026-08-10"
+        },
+        {
+          "title": "03 · Express.js 라우팅 실습",
+          "type": "LAB",
+          "date": "2026-08-10"
+        },
+        {
+          "title": "모던 웹 개발 및 보안",
+          "type": "STUDY",
+          "date": "2026-08-09"
+        },
+        {
+          "title": "01 · Node.js 개요 및 개발 환경 구축",
+          "type": "STUDY",
+          "date": "2026-08-09"
+        },
+        {
+          "title": "02 · Express.js 기초 및 HTTP 요청 처리",
+          "type": "STUDY",
+          "date": "2026-08-09"
+        },
+        {
+          "title": "취약점 구현(ReDoS)",
+          "type": "STUDY",
+          "date": "2026-07-26"
+        },
+        {
+          "title": "네이버 검색 API 연동부터 실행까지: Python 실습 기록",
+          "type": "LAB",
+          "date": "2026-07-26"
+        }
+      ]
+    },
+    {
+      "id": "systems-network",
+      "number": "05",
+      "title": "Systems & Network",
+      "korean": "운영체제·리눅스·네트워크",
+      "description": "운영체제의 추상화와 커널, Linux 환경, 네트워크 계층과 TCP 통신의 기초를 직접 확인합니다.",
+      "keywords": [
+        "Linux",
+        "OS",
+        "Kernel",
+        "TCP",
+        "IPv4"
+      ],
+      "items": [
+        {
+          "title": "운영체제·Linux · 개론 · OS · Unix · GNU · 배포판 역사",
+          "type": "STUDY",
+          "date": "2026-08-05"
+        },
+        {
+          "title": "운영체제·Linux · 01강 · Distribution · Kernel · Ubuntu",
+          "type": "STUDY",
+          "date": "2026-08-05"
+        },
+        {
+          "title": "운영체제·Linux · 02강 · Virtual Machine · Ubuntu 설치",
+          "type": "STUDY",
+          "date": "2026-08-05"
+        },
+        {
+          "title": "운영체제·Linux · 03강 · GUI · CLI · GNOME",
+          "type": "STUDY",
+          "date": "2026-08-05"
+        },
+        {
+          "title": "02 · Link Layer · Network Layer · IPv4",
+          "type": "STUDY",
+          "date": "2026-08-05"
+        },
+        {
+          "title": "TCP 소켓 통신 실습 기록",
+          "type": "LAB",
+          "date": "2026-07-26"
+        }
+      ]
+    },
+    {
+      "id": "container-cloud-native",
+      "number": "06",
+      "title": "Container & Cloud Native",
+      "korean": "컨테이너·클라우드 네이티브 보안",
+      "description": "Namespace와 cgroup부터 안전한 Dockerfile, 런타임·네트워크 통제, 로깅과 Kubernetes 대응까지 다룹니다.",
+      "keywords": [
+        "Docker",
+        "Container",
+        "Kubernetes",
+        "Runtime",
+        "Logging"
+      ],
+      "items": [
+        {
+          "title": "컨테이너 보안 · 13~15차시 · Logging · Kubernetes · Incident Response",
+          "type": "STUDY",
+          "date": "2026-08-06"
+        },
+        {
+          "title": "컨테이너 보안 · 10~12차시 · Vulnerability · Runtime · Network",
+          "type": "STUDY",
+          "date": "2026-08-05"
+        },
+        {
+          "title": "컨테이너 보안 · 07~09차시 · Docker Compose · Threats · Dockerfile Security",
+          "type": "STUDY",
+          "date": "2026-08-05"
+        },
+        {
+          "title": "컨테이너 보안 · 01차시 · VM vs Container · Namespace · cgroup",
+          "type": "STUDY",
+          "date": "2026-08-05"
+        },
+        {
+          "title": "04 · Kubernetes · DevOps · Cloud Native",
+          "type": "STUDY",
+          "date": "2026-08-05"
+        },
+        {
+          "title": "컨테이너 보안 · 04차시 · Dockerfile · Build · Cache",
+          "type": "STUDY",
+          "date": "2026-08-05"
+        }
+      ]
+    }
+  ]
+}
