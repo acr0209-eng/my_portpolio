@@ -120,6 +120,71 @@ const sortPortfolioPosts = (items) => [...items].sort((a, b) => {
   return getMillis(b.createdAt || b.updatedAt) - getMillis(a.createdAt || a.updatedAt);
 });
 
+const notionStudyOrder = [
+  '3b73f93e21d5818d9e4efd090c9fb007',
+  '3b73f93e21d581e6b110d68162275faf',
+  '3b83f93e21d581b28fd3f2c49b5ecbd9',
+  '3bb3f93e21d58132a9f0e1b02703fdd5',
+  '3b23f93e21d581d19b14c0ad8ed5a618',
+  '3b23f93e21d58155874afc26a13acc3e',
+  '3b23f93e21d581ef8df7c3b160f32aed',
+  '3b23f93e21d581eea790fc5ff3230986',
+  '3b23f93e21d581e6bde0e80f9cd8f387',
+  '3b23f93e21d58190976bc5b7f4491945',
+  '3c13f93e21d581568a34c1977b0692d4',
+  '3c13f93e21d581eb8dadeeb84ac6f545',
+  '3c13f93e21d581e19273f002b5816db0',
+  '3c13f93e21d58176b463f304c949954d',
+  '3c23f93e21d5810cbd5aca5f85e65f65',
+  '3b13f93e21d581e88f29dfb60c5f1604',
+  '3b13f93e21d581c3a43fca5b0d1551f6',
+  '3b13f93e21d58187acc1e1d2cce73a06',
+  '3b13f93e21d581c0afcad5e028031317',
+  '3b13f93e21d581f3b8ebe074cbfeae3f',
+  '3b23f93e21d5810ca9c4d3f953890ee0',
+  '3b23f93e21d581ccb506c3a7d9260556',
+  '3b23f93e21d58163bec4c03a249d633a',
+  '3b23f93e21d5810f89ffc66ec3aeb20f',
+  '3b33f93e21d581a49167d86dec68dfcf',
+  '3b43f93e21d5817bbdd4d7ee730c16bc',
+  '3b43f93e21d581379a4cc55bcdd734eb',
+  '3b43f93e21d58121980ef2e8f8e856dc',
+  '3b43f93e21d5817183fef91da84f0e81',
+  '3b43f93e21d58165be16f5cb1012d37f',
+  '3b43f93e21d581d3ab2dd0af2b9c263e',
+  '3b63f93e21d581619527f8528bed313f',
+  '3bc3f93e21d581b0856ae7db125238ee',
+  '3bc3f93e21d5811894cfe6c0761f14eb',
+  '3bc3f93e21d581c5956de813ba26f826',
+  '3bf3f93e21d581c2a4b5e879f2a3074b',
+  '3bf3f93e21d58147b65deffbd34d319a',
+  '3bf3f93e21d5816aba2be96972cccc03',
+  '3bf3f93e21d58171997fc8eb67806eac',
+  '3bf3f93e21d581f4aa45ff0d29cc7ebb',
+  '3bf3f93e21d581189832db8dddb59c71',
+  '3bf3f93e21d581f1bdccf62137aafe09',
+  '3bf3f93e21d581bc812cc1341736d6a8',
+  '3bf3f93e21d5814e9be8e2dcd201bd83',
+  '3bf3f93e21d581b1a48de312c6abf0b1',
+  '3bf3f93e21d581a6b09bee41325666de',
+  '3bf3f93e21d5813080f5d4be8315312e',
+  '3bf3f93e21d58192a165ffb6db007dd7',
+  '3bf3f93e21d581cc8c08ce152b951f8a',
+  '3bf3f93e21d5817f9439f8a54d3a35d8',
+];
+
+const notionStudyOrderIndex = new Map(
+  notionStudyOrder.map((id, index) => [id, index]),
+);
+
+const orderedKnowledgeItems = [...knowledgeItems].sort((a, b) => {
+  const aOrder = notionStudyOrderIndex.get(a.id.replaceAll('-', '')) ?? Number.MAX_SAFE_INTEGER;
+  const bOrder = notionStudyOrderIndex.get(b.id.replaceAll('-', '')) ?? Number.MAX_SAFE_INTEGER;
+
+  if (aOrder !== bOrder) return aOrder - bOrder;
+  return getMillis(b.date) - getMillis(a.date) || a.title.localeCompare(b.title, 'ko-KR');
+});
+
 function App() {
   const revealRefs = useRef([]);
   const [hash, setHash] = useState(window.location.hash || '#home');
@@ -258,8 +323,8 @@ function App() {
     : displayedPosts.filter((post) => post.category === activeFilter);
   const selectedDomain = knowledgeData.domains.find((domain) => domain.id === activeDomain);
   const visibleKnowledgeItems = activeDomain === 'all'
-    ? knowledgeItems
-    : knowledgeItems.filter((item) => item.domainId === activeDomain);
+    ? orderedKnowledgeItems
+    : orderedKnowledgeItems.filter((item) => item.domainId === activeDomain);
   const normalizedKnowledgeQuery = knowledgeQuery.trim().toLocaleLowerCase('ko-KR');
   const filteredKnowledgeItems = normalizedKnowledgeQuery
     ? visibleKnowledgeItems.filter((item) =>
