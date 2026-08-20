@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import {
   addDoc,
   collection,
@@ -35,6 +36,69 @@ const emptyDraft = {
   externalUrl: '',
   tags: '',
   published: true,
+};
+
+const markdownPlugins = [remarkGfm];
+const markdownComponents = {
+  table: ({ children }) => (
+    <div className="markdown-table-wrap">
+      <table>{children}</table>
+    </div>
+  ),
+};
+
+const normalizeMarkdown = (source = '') => {
+  const lines = source.replace(/\r\n?/g, '\n').split('\n');
+  const normalized = [];
+  let insideFence = false;
+
+  for (let index = 0; index < lines.length; index += 1) {
+    const line = lines[index];
+    const trimmed = line.trim();
+
+    if (/^(```|~~~)/.test(trimmed)) {
+      insideFence = !insideFence;
+      normalized.push(line);
+      continue;
+    }
+
+    if (!insideFence && /^\s*\|.*\|\s*$/.test(line)) {
+      const tableLines = [];
+      let cursor = index;
+
+      while (cursor < lines.length && /^\s*\|.*\|\s*$/.test(lines[cursor])) {
+        tableLines.push(lines[cursor].trim());
+        cursor += 1;
+      }
+
+      const hasDivider = tableLines.some((tableLine) =>
+        /^\|\s*:?-{3,}:?\s*(\|\s*:?-{3,}:?\s*)+\|$/.test(tableLine));
+
+      if (hasDivider) {
+        if (normalized.length > 0 && normalized.at(-1) !== '') normalized.push('');
+        normalized.push(...tableLines);
+        if (cursor < lines.length && lines[cursor].trim() !== '') normalized.push('');
+        index = cursor - 1;
+        continue;
+      }
+    }
+
+    const packedNumberedLine = line.trimStart();
+    if (
+      !insideFence
+      && /^1\.\s/.test(packedNumberedLine)
+      && /\S\d{1,2}\.\s/.test(packedNumberedLine)
+    ) {
+      if (normalized.length > 0 && normalized.at(-1) !== '') normalized.push('');
+      normalized.push(packedNumberedLine.replace(/(\S)(?=\d{1,2}\.\s)/g, '$1\n'));
+      if (index + 1 < lines.length && lines[index + 1].trim() !== '') normalized.push('');
+      continue;
+    }
+
+    normalized.push(line);
+  }
+
+  return normalized.join('\n');
 };
 
 const experienceItems = [
@@ -107,11 +171,6 @@ const sortPosts = (items) => [...items].sort(
   (a, b) => getMillis(b.createdAt || b.updatedAt) - getMillis(a.createdAt || a.updatedAt),
 );
 
-const getPostDedupeKey = (post) => post.title
-  ?.trim()
-  .toLocaleLowerCase('ko-KR')
-  .replace(/\s+/g, ' ') || post.slug || post.id;
-
 const sortPortfolioPosts = (items) => [...items].sort((a, b) => {
   const aOrder = Number.isInteger(a.notionOrder) ? a.notionOrder : Number.MAX_SAFE_INTEGER;
   const bOrder = Number.isInteger(b.notionOrder) ? b.notionOrder : Number.MAX_SAFE_INTEGER;
@@ -119,6 +178,8 @@ const sortPortfolioPosts = (items) => [...items].sort((a, b) => {
   if (aOrder !== bOrder) return aOrder - bOrder;
   return getMillis(b.createdAt || b.updatedAt) - getMillis(a.createdAt || a.updatedAt);
 });
+
+const orderedNotionPosts = sortPortfolioPosts(notionPosts);
 
 const notionStudyOrder = [
   '3b73f93e21d5818d9e4efd090c9fb007',
@@ -192,7 +253,7 @@ function App() {
   const [activeDomain, setActiveDomain] = useState('all');
   const [knowledgeQuery, setKnowledgeQuery] = useState('');
   const [visibleKnowledgeLimit, setVisibleKnowledgeLimit] = useState(12);
-  const [publicPosts, setPublicPosts] = useState([]);
+  const [, setPublicPosts] = useState([]);
   const [adminPosts, setAdminPosts] = useState([]);
   const [loadingPosts, setLoadingPosts] = useState(isFirebaseConfigured);
   const [firebaseError, setFirebaseError] = useState('');
@@ -303,16 +364,7 @@ function App() {
     );
   }, [user]);
 
-  const displayedPosts = useMemo(() => {
-    const uniquePosts = new Map();
-
-    [...notionPosts, ...sortPosts(publicPosts)].forEach((post) => {
-      const key = getPostDedupeKey(post);
-      if (!uniquePosts.has(key)) uniquePosts.set(key, post);
-    });
-
-    return sortPortfolioPosts([...uniquePosts.values()]);
-  }, [publicPosts]);
+  const displayedPosts = orderedNotionPosts;
 
   const categories = useMemo(
     () => ['전체', ...new Set(displayedPosts.map((post) => post.category).filter(Boolean))],
@@ -567,7 +619,11 @@ function App() {
                       {knowledgeContentError && (
                         <p className="content-status content-status-error">본문을 불러오지 못했습니다. 아래 Notion 원문을 이용해 주세요.</p>
                       )}
-                      {selectedKnowledgeContent?.body && <ReactMarkdown>{selectedKnowledgeContent.body}</ReactMarkdown>}
+                      {selectedKnowledgeContent?.body && (
+                        <ReactMarkdown remarkPlugins={markdownPlugins} components={markdownComponents}>
+                          {normalizeMarkdown(selectedKnowledgeContent.body)}
+                        </ReactMarkdown>
+                      )}
                       {!selectedKnowledgeItem.hasContent && (
                         <>
                           <h2>기록 개요</h2>
@@ -638,7 +694,9 @@ function App() {
                   <article className="article-content">
                     {selectedPost.coverImage && <img className="article-cover" src={selectedPost.coverImage} alt="" />}
                     <div className="markdown-body">
-                      <ReactMarkdown>{selectedPost.body || '이 기록은 외부 원문에서 확인할 수 있습니다.'}</ReactMarkdown>
+                      <ReactMarkdown remarkPlugins={markdownPlugins} components={markdownComponents}>
+                        {normalizeMarkdown(selectedPost.body || '이 기록은 외부 원문에서 확인할 수 있습니다.')}
+                      </ReactMarkdown>
                     </div>
                     <div className="source-panel">
                       <div>
@@ -723,7 +781,9 @@ function App() {
                 </form>
                 <div className="markdown-preview">
                   <p className="micro-label">MARKDOWN PREVIEW</p>
-                  <ReactMarkdown>{draft.body || '*본문 미리보기가 여기에 표시됩니다.*'}</ReactMarkdown>
+                  <ReactMarkdown remarkPlugins={markdownPlugins} components={markdownComponents}>
+                    {normalizeMarkdown(draft.body || '*본문 미리보기가 여기에 표시됩니다.*')}
+                  </ReactMarkdown>
                 </div>
               </section>
 
