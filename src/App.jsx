@@ -107,6 +107,84 @@ const sortPosts = (items) => [...items].sort(
   (a, b) => getMillis(b.createdAt || b.updatedAt) - getMillis(a.createdAt || a.updatedAt),
 );
 
+const getPostDedupeKey = (post) => post.title
+  ?.trim()
+  .toLocaleLowerCase('ko-KR')
+  .replace(/\s+/g, ' ') || post.slug || post.id;
+
+const sortPortfolioPosts = (items) => [...items].sort((a, b) => {
+  const aOrder = Number.isInteger(a.notionOrder) ? a.notionOrder : Number.MAX_SAFE_INTEGER;
+  const bOrder = Number.isInteger(b.notionOrder) ? b.notionOrder : Number.MAX_SAFE_INTEGER;
+
+  if (aOrder !== bOrder) return aOrder - bOrder;
+  return getMillis(b.createdAt || b.updatedAt) - getMillis(a.createdAt || a.updatedAt);
+});
+
+const notionStudyOrder = [
+  '3b73f93e21d5818d9e4efd090c9fb007',
+  '3b73f93e21d581e6b110d68162275faf',
+  '3b83f93e21d581b28fd3f2c49b5ecbd9',
+  '3bb3f93e21d58132a9f0e1b02703fdd5',
+  '3b23f93e21d581d19b14c0ad8ed5a618',
+  '3b23f93e21d58155874afc26a13acc3e',
+  '3b23f93e21d581ef8df7c3b160f32aed',
+  '3b23f93e21d581eea790fc5ff3230986',
+  '3b23f93e21d581e6bde0e80f9cd8f387',
+  '3b23f93e21d58190976bc5b7f4491945',
+  '3c13f93e21d581568a34c1977b0692d4',
+  '3c13f93e21d581eb8dadeeb84ac6f545',
+  '3c13f93e21d581e19273f002b5816db0',
+  '3c13f93e21d58176b463f304c949954d',
+  '3c23f93e21d5810cbd5aca5f85e65f65',
+  '3b13f93e21d581e88f29dfb60c5f1604',
+  '3b13f93e21d581c3a43fca5b0d1551f6',
+  '3b13f93e21d58187acc1e1d2cce73a06',
+  '3b13f93e21d581c0afcad5e028031317',
+  '3b13f93e21d581f3b8ebe074cbfeae3f',
+  '3b23f93e21d5810ca9c4d3f953890ee0',
+  '3b23f93e21d581ccb506c3a7d9260556',
+  '3b23f93e21d58163bec4c03a249d633a',
+  '3b23f93e21d5810f89ffc66ec3aeb20f',
+  '3b33f93e21d581a49167d86dec68dfcf',
+  '3b43f93e21d5817bbdd4d7ee730c16bc',
+  '3b43f93e21d581379a4cc55bcdd734eb',
+  '3b43f93e21d58121980ef2e8f8e856dc',
+  '3b43f93e21d5817183fef91da84f0e81',
+  '3b43f93e21d58165be16f5cb1012d37f',
+  '3b43f93e21d581d3ab2dd0af2b9c263e',
+  '3b63f93e21d581619527f8528bed313f',
+  '3bc3f93e21d581b0856ae7db125238ee',
+  '3bc3f93e21d5811894cfe6c0761f14eb',
+  '3bc3f93e21d581c5956de813ba26f826',
+  '3bf3f93e21d581c2a4b5e879f2a3074b',
+  '3bf3f93e21d58147b65deffbd34d319a',
+  '3bf3f93e21d5816aba2be96972cccc03',
+  '3bf3f93e21d58171997fc8eb67806eac',
+  '3bf3f93e21d581f4aa45ff0d29cc7ebb',
+  '3bf3f93e21d581189832db8dddb59c71',
+  '3bf3f93e21d581f1bdccf62137aafe09',
+  '3bf3f93e21d581bc812cc1341736d6a8',
+  '3bf3f93e21d5814e9be8e2dcd201bd83',
+  '3bf3f93e21d581b1a48de312c6abf0b1',
+  '3bf3f93e21d581a6b09bee41325666de',
+  '3bf3f93e21d5813080f5d4be8315312e',
+  '3bf3f93e21d58192a165ffb6db007dd7',
+  '3bf3f93e21d581cc8c08ce152b951f8a',
+  '3bf3f93e21d5817f9439f8a54d3a35d8',
+];
+
+const notionStudyOrderIndex = new Map(
+  notionStudyOrder.map((id, index) => [id, index]),
+);
+
+const orderedKnowledgeItems = [...knowledgeItems].sort((a, b) => {
+  const aOrder = notionStudyOrderIndex.get(a.id.replaceAll('-', '')) ?? Number.MAX_SAFE_INTEGER;
+  const bOrder = notionStudyOrderIndex.get(b.id.replaceAll('-', '')) ?? Number.MAX_SAFE_INTEGER;
+
+  if (aOrder !== bOrder) return aOrder - bOrder;
+  return getMillis(b.date) - getMillis(a.date) || a.title.localeCompare(b.title, 'ko-KR');
+});
+
 function App() {
   const revealRefs = useRef([]);
   const [hash, setHash] = useState(window.location.hash || '#home');
@@ -226,13 +304,14 @@ function App() {
   }, [user]);
 
   const displayedPosts = useMemo(() => {
-    const seen = new Set();
-    return sortPosts([...publicPosts, ...notionPosts]).filter((post) => {
-      const key = post.slug || post.title;
-      if (seen.has(key)) return false;
-      seen.add(key);
-      return true;
+    const uniquePosts = new Map();
+
+    [...notionPosts, ...sortPosts(publicPosts)].forEach((post) => {
+      const key = getPostDedupeKey(post);
+      if (!uniquePosts.has(key)) uniquePosts.set(key, post);
     });
+
+    return sortPortfolioPosts([...uniquePosts.values()]);
   }, [publicPosts]);
 
   const categories = useMemo(
@@ -242,14 +321,10 @@ function App() {
   const filteredPosts = activeFilter === '전체'
     ? displayedPosts
     : displayedPosts.filter((post) => post.category === activeFilter);
-  const featuredPost = displayedPosts.find((post) => post.featured) || displayedPosts[0];
-  const archivePosts = activeFilter === '전체'
-    ? filteredPosts.filter((post) => post.id !== featuredPost?.id)
-    : filteredPosts;
   const selectedDomain = knowledgeData.domains.find((domain) => domain.id === activeDomain);
   const visibleKnowledgeItems = activeDomain === 'all'
-    ? knowledgeItems
-    : knowledgeItems.filter((item) => item.domainId === activeDomain);
+    ? orderedKnowledgeItems
+    : orderedKnowledgeItems.filter((item) => item.domainId === activeDomain);
   const normalizedKnowledgeQuery = knowledgeQuery.trim().toLocaleLowerCase('ko-KR');
   const filteredKnowledgeItems = normalizedKnowledgeQuery
     ? visibleKnowledgeItems.filter((item) =>
@@ -786,63 +861,70 @@ function App() {
             {loadingPosts && <div className="empty-state">새 기록을 불러오는 중입니다.</div>}
             {firebaseError && <div className="setup-notice">{firebaseError}</div>}
 
-            {activeFilter === '전체' && featuredPost && (
-              <article className="featured-case reveal" ref={addReveal}>
-                <div className="featured-visual">
-                  <div className="ui-study-card ui-study-before">
-                    <span>BEFORE</span>
-                    <div className="fake-window">
-                      <i /><i /><i />
-                      <strong>보안 경고</strong>
-                      <small>복잡한 절차와 불분명한 선택지</small>
-                    </div>
-                  </div>
-                  <div className="ui-study-card ui-study-after">
-                    <span>AFTER</span>
-                    <div className="fake-window">
-                      <i /><i /><i />
-                      <strong>안전한 다음 단계</strong>
-                      <small>맥락을 설명하는 명확한 흐름</small>
-                    </div>
-                  </div>
-                  <span className="study-axis">HUMAN FACTOR / SECURITY CONTROL</span>
-                </div>
-                <div className="featured-copy">
-                  <p className="case-meta">FEATURED / {featuredPost.category}</p>
-                  <h3>{featuredPost.title}</h3>
-                  <p>{featuredPost.summary}</p>
-                  <div className="tag-list">
-                    {featuredPost.tags?.map((tag) => <span key={tag}>{tag}</span>)}
-                  </div>
-                  <a className="case-link" href={`#post/${encodeURIComponent(featuredPost.slug || featuredPost.id)}`}>
-                    CASE STUDY <span>↗</span>
-                  </a>
-                </div>
-              </article>
-            )}
-
             <div className="case-grid">
-              {archivePosts.map((post, index) => (
-                <article className="case-card reveal" data-category={post.category} key={post.id} ref={addReveal}>
-                  <div className="case-card-top">
-                    <span>{String(index + 1).padStart(2, '0')}</span>
-                    <span>{post.isNotion ? 'NOTION ARCHIVE' : 'FIELD NOTE'}</span>
-                  </div>
-                  <div>
-                    <p className="case-meta">{post.category || 'WRITING'}</p>
-                    <h3>{post.title}</h3>
-                    <p className="case-summary">{post.summary}</p>
-                  </div>
-                  <div className="case-card-bottom">
-                    <div className="tag-list">
-                      {post.tags?.slice(0, 3).map((tag) => <span key={tag}>{tag}</span>)}
+              {filteredPosts.map((post) => {
+                const postIndex = displayedPosts.findIndex((item) => item.id === post.id) + 1;
+                const displayIndex = String(postIndex).padStart(2, '0');
+
+                return post.featured ? (
+                  <article className="featured-case reveal" key={post.id} ref={addReveal}>
+                    <div className="featured-visual">
+                      <div className="ui-study-card ui-study-before">
+                        <span>BEFORE</span>
+                        <div className="fake-window">
+                          <i /><i /><i />
+                          <strong>보안 경고</strong>
+                          <small>복잡한 절차와 불분명한 선택지</small>
+                        </div>
+                      </div>
+                      <div className="ui-study-card ui-study-after">
+                        <span>AFTER</span>
+                        <div className="fake-window">
+                          <i /><i /><i />
+                          <strong>안전한 다음 단계</strong>
+                          <small>맥락을 설명하는 명확한 흐름</small>
+                        </div>
+                      </div>
+                      <span className="study-axis">HUMAN FACTOR / SECURITY CONTROL</span>
                     </div>
-                    <a className="case-link" href={`#post/${encodeURIComponent(post.slug || post.id)}`} aria-label={`${post.title} 읽기`}>↗</a>
-                  </div>
-                </article>
-              ))}
+                    <div className="featured-copy">
+                      <div className="case-card-top featured-case-top">
+                        <span>{displayIndex}</span>
+                        <span>{post.isNotion ? 'NOTION ARCHIVE' : 'FIELD NOTE'}</span>
+                      </div>
+                      <p className="case-meta">FEATURED / {post.category}</p>
+                      <h3>{post.title}</h3>
+                      <p>{post.summary}</p>
+                      <div className="tag-list">
+                        {post.tags?.map((tag) => <span key={tag}>{tag}</span>)}
+                      </div>
+                      <a className="case-link" href={`#post/${encodeURIComponent(post.slug || post.id)}`}>
+                        CASE STUDY <span>↗</span>
+                      </a>
+                    </div>
+                  </article>
+                ) : (
+                  <article className="case-card reveal" data-category={post.category} key={post.id} ref={addReveal}>
+                    <div className="case-card-top">
+                      <span>{displayIndex}</span>
+                      <span>{post.isNotion ? 'NOTION ARCHIVE' : 'FIELD NOTE'}</span>
+                    </div>
+                    <div>
+                      <p className="case-meta">{post.category || 'WRITING'}</p>
+                      <h3>{post.title}</h3>
+                      <p className="case-summary">{post.summary}</p>
+                    </div>
+                    <div className="case-card-bottom">
+                      <div className="tag-list">
+                        {post.tags?.slice(0, 3).map((tag) => <span key={tag}>{tag}</span>)}
+                      </div>
+                      <a className="case-link" href={`#post/${encodeURIComponent(post.slug || post.id)}`} aria-label={`${post.title} 읽기`}>↗</a>
+                    </div>
+                  </article>
+                );
+              })}
             </div>
-            {archivePosts.length === 0 && <div className="empty-state">이 분류의 기록은 아직 없습니다.</div>}
+            {filteredPosts.length === 0 && <div className="empty-state">이 분류의 기록은 아직 없습니다.</div>}
           </div>
         </section>
 
