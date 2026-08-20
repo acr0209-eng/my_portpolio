@@ -1853,8 +1853,10 @@ select:focus-visible {
 }
 
 .markdown-body {
+  min-width: 0;
   font-size: 1.03rem;
   line-height: 1.9;
+  overflow-wrap: anywhere;
 }
 
 .markdown-body h2 {
@@ -1873,6 +1875,7 @@ select:focus-visible {
 .markdown-body p {
   margin: 0 0 22px;
   color: var(--ink-soft);
+  white-space: pre-line;
 }
 
 .markdown-body ul,
@@ -1890,19 +1893,106 @@ select:focus-visible {
   color: var(--blue);
   text-decoration: underline;
   text-underline-offset: 4px;
+  overflow-wrap: anywhere;
+}
+
+.markdown-table-wrap {
+  width: 100%;
+  max-width: 100%;
+  margin: 28px 0 34px;
+  overflow-x: auto;
+  border: 1px solid var(--ink);
+  background: var(--paper-bright);
+}
+
+.markdown-table-wrap table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+.markdown-body th,
+.markdown-body td,
+.markdown-preview th,
+.markdown-preview td {
+  padding: 12px 14px;
+  border-right: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+  vertical-align: top;
+  white-space: normal;
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+}
+
+.markdown-body th:last-child,
+.markdown-body td:last-child,
+.markdown-preview th:last-child,
+.markdown-preview td:last-child {
+  border-right: 0;
+}
+
+.markdown-body tbody tr:last-child td,
+.markdown-preview tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.markdown-body th,
+.markdown-preview th {
+  background: var(--ink);
+  color: white;
+  font-family: var(--mono);
+  font-size: 0.72rem;
 }
 
 .markdown-body pre,
 .markdown-preview pre {
+  max-width: 100%;
   overflow-x: auto;
   padding: 20px;
   background: var(--ink);
   color: white;
+  white-space: pre-wrap;
+  word-break: break-word;
+  overflow-wrap: anywhere;
 }
 
 .markdown-body code,
 .markdown-preview code {
   font-family: var(--mono);
+}
+
+.markdown-body pre code,
+.markdown-preview pre code {
+  white-space: inherit;
+}
+
+.markdown-body :not(pre) > code,
+.markdown-preview :not(pre) > code {
+  padding: 0.12em 0.32em;
+  background: rgba(45, 88, 214, 0.1);
+  color: var(--blue);
+  white-space: normal;
+  word-break: break-word;
+}
+
+.markdown-body blockquote,
+.markdown-preview blockquote {
+  margin: 28px 0;
+  padding: 18px 22px;
+  border-left: 4px solid var(--blue);
+  background: rgba(45, 88, 214, 0.07);
+}
+
+.markdown-body blockquote > :last-child,
+.markdown-preview blockquote > :last-child {
+  margin-bottom: 0;
+}
+
+.markdown-body img,
+.markdown-preview img {
+  max-width: 100%;
+  height: auto;
 }
 
 .source-panel {
@@ -2188,6 +2278,11 @@ select:focus-visible {
 @media (max-width: 780px) {
   html {
     scroll-padding-top: 72px;
+  }
+
+  .markdown-table-wrap table {
+    min-width: 580px;
+    table-layout: auto;
   }
 
   .container,
