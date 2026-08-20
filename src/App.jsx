@@ -103,6 +103,15 @@ const notionPosts = postsData.map((post) => ({
   published: true,
 }));
 
+const knowledgeItems = knowledgeData.domains.flatMap((domain) =>
+  domain.items.map((item) => ({
+    ...item,
+    domainId: domain.id,
+    domainTitle: domain.title,
+    domainKorean: domain.korean,
+  })),
+);
+
 const slugify = (value) => value
   .trim()
   .toLowerCase()
@@ -160,6 +169,9 @@ function App() {
   const [editingId, setEditingId] = useState(null);
   const [saving, setSaving] = useState(false);
   const [statusMessage, setStatusMessage] = useState('');
+  const [selectedKnowledgeContent, setSelectedKnowledgeContent] = useState(null);
+  const [knowledgeContentLoading, setKnowledgeContentLoading] = useState(false);
+  const [knowledgeContentError, setKnowledgeContentError] = useState('');
 
   const addReveal = (element) => {
     if (element && !revealRefs.current.includes(element)) revealRefs.current.push(element);
@@ -169,7 +181,7 @@ function App() {
     const onHashChange = () => {
       const nextHash = window.location.hash || '#home';
       setHash(nextHash);
-      if (nextHash.startsWith('#post/') || nextHash === '#admin') {
+      if (nextHash.startsWith('#post/') || nextHash.startsWith('#note/') || nextHash === '#admin') {
         window.scrollTo({ top: 0, behavior: 'instant' });
       }
     };
@@ -277,9 +289,46 @@ function App() {
   const isAdminRoute = hash === '#admin';
   const canUseAdmin = isFirebaseConfigured && Boolean(ownerUid);
   const postSlug = hash.startsWith('#post/') ? decodeURIComponent(hash.slice(6)) : null;
+  const knowledgeSlug = hash.startsWith('#note/') ? decodeURIComponent(hash.slice(6)) : null;
   const selectedPost = postSlug
     ? displayedPosts.find((post) => post.slug === postSlug || post.id === postSlug)
     : null;
+  const selectedKnowledgeItem = knowledgeSlug
+    ? knowledgeItems.find((item) => item.slug === knowledgeSlug || item.id === knowledgeSlug)
+    : null;
+
+  useEffect(() => {
+    if (!knowledgeSlug || !selectedKnowledgeItem?.hasContent) {
+      setSelectedKnowledgeContent(null);
+      setKnowledgeContentLoading(false);
+      setKnowledgeContentError('');
+      return undefined;
+    }
+
+    const controller = new AbortController();
+    setSelectedKnowledgeContent(null);
+    setKnowledgeContentLoading(true);
+    setKnowledgeContentError('');
+
+    fetch(`${import.meta.env.BASE_URL}knowledge-content.json`, { signal: controller.signal })
+      .then((response) => {
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        return response.json();
+      })
+      .then((data) => {
+        const note = data.notes?.[knowledgeSlug];
+        if (!note) throw new Error('본문 데이터가 없습니다.');
+        setSelectedKnowledgeContent(note);
+      })
+      .catch((error) => {
+        if (error.name !== 'AbortError') setKnowledgeContentError(error.message);
+      })
+      .finally(() => {
+        if (!controller.signal.aborted) setKnowledgeContentLoading(false);
+      });
+
+    return () => controller.abort();
+  }, [knowledgeSlug, selectedKnowledgeItem]);
 
   const scrollToKnowledge = (selector = '#knowledge') => {
     window.requestAnimationFrame(() => {
@@ -426,6 +475,79 @@ function App() {
       </div>
     </header>
   );
+
+  if (knowledgeSlug) {
+    return renderShell(
+      <>
+        {renderHeader({ href: '#knowledge', label: 'BACK TO ATLAS' })}
+        <main id="main-content" className="article-page knowledge-article-page">
+          {!selectedKnowledgeItem ? (
+            <div className="container empty-page">
+              <p className="section-kicker">404 / NOTE NOT FOUND</p>
+              <h1>학습 기록을 찾을 수 없습니다.</h1>
+              <a className="primary-button" href="#knowledge">Knowledge Atlas로 돌아가기</a>
+            </div>
+          ) : (
+            <>
+              <section className="article-hero knowledge-article-hero">
+                <div className="container">
+                  <div className="article-breadcrumb">
+                    <span>{selectedKnowledgeItem.type}</span>
+                    <span>{selectedKnowledgeItem.domainTitle}</span>
+                  </div>
+                  <h1>{selectedKnowledgeItem.title}</h1>
+                  <p className="article-summary">{selectedKnowledgeItem.summary}</p>
+                  <div className="article-facts">
+                    <div><span>DATE</span><strong>{selectedKnowledgeItem.date.replaceAll('-', '.')}</strong></div>
+                    <div><span>TYPE</span><strong>{selectedKnowledgeItem.type}</strong></div>
+                    <div><span>DOMAIN</span><strong>{selectedKnowledgeItem.domainKorean}</strong></div>
+                  </div>
+                </div>
+              </section>
+              <section className="article-body-section">
+                <div className="article-layout container">
+                  <aside className="article-aside">
+                    <p className="micro-label">KNOWLEDGE NOTE</p>
+                    <p>{selectedKnowledgeItem.hasContent ? 'FULL STUDY NOTE' : 'NOTION INDEX'}</p>
+                    <div className="tag-list">
+                      <span>{selectedKnowledgeItem.type}</span>
+                      <span>{selectedKnowledgeItem.domainTitle}</span>
+                    </div>
+                  </aside>
+                  <article className="article-content">
+                    <div className="markdown-body knowledge-markdown-body">
+                      {knowledgeContentLoading && <p className="content-status">Notion 학습 내용을 불러오는 중입니다…</p>}
+                      {knowledgeContentError && (
+                        <p className="content-status content-status-error">본문을 불러오지 못했습니다. 아래 Notion 원문을 이용해 주세요.</p>
+                      )}
+                      {selectedKnowledgeContent?.body && <ReactMarkdown>{selectedKnowledgeContent.body}</ReactMarkdown>}
+                      {!selectedKnowledgeItem.hasContent && (
+                        <>
+                          <h2>기록 개요</h2>
+                          <p>{selectedKnowledgeItem.summary}</p>
+                          <p>프로젝트·실습·보고서 원문은 아래 Notion 출처에서 확인할 수 있습니다.</p>
+                        </>
+                      )}
+                    </div>
+                    <div className="source-panel">
+                      <div>
+                        <p className="micro-label">SOURCE / NOTION</p>
+                        <h2>원문과 전체 아카이브</h2>
+                      </div>
+                      <div className="source-actions">
+                        <a className="primary-button" href={selectedKnowledgeItem.notionUrl} target="_blank" rel="noreferrer">Notion 원문 보기 ↗</a>
+                        <a className="outline-button" href="#knowledge">Atlas로 돌아가기</a>
+                      </div>
+                    </div>
+                  </article>
+                </div>
+              </section>
+            </>
+          )}
+        </main>
+      </>,
+    );
+  }
 
   if (postSlug) {
     return renderShell(
@@ -872,14 +994,22 @@ function App() {
 
                 <div className="knowledge-note-list">
                   {visibleKnowledgeItems.map((item, index) => (
-                    <article key={item.title} className="knowledge-note">
+                    <a
+                      key={item.id}
+                      className="knowledge-note"
+                      href={`#note/${item.slug}`}
+                      aria-label={`${item.title} 상세 보기`}
+                    >
                       <span className="note-index">{String(index + 1).padStart(2, '0')}</span>
                       <div>
                         <span className="note-type">{item.type}</span>
                         <h4>{item.title}</h4>
                       </div>
-                      <time dateTime={item.date}>{item.date.replaceAll('-', '.')}</time>
-                    </article>
+                      <div className="note-meta">
+                        <time dateTime={item.date}>{item.date.replaceAll('-', '.')}</time>
+                        <span className="note-open">READ ↗</span>
+                      </div>
+                    </a>
                   ))}
                 </div>
               </div>
