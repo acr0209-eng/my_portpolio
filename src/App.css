@@ -929,6 +929,16 @@ select:focus-visible {
   background: var(--ink);
 }
 
+.case-grid .featured-case {
+  grid-column: 1 / -1;
+  box-shadow: none;
+}
+
+.featured-case-top {
+  width: 100%;
+  margin-bottom: 20px;
+}
+
 .case-card {
   min-height: 390px;
   display: flex;

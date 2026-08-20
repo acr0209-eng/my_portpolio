@@ -107,6 +107,19 @@ const sortPosts = (items) => [...items].sort(
   (a, b) => getMillis(b.createdAt || b.updatedAt) - getMillis(a.createdAt || a.updatedAt),
 );
 
+const getPostDedupeKey = (post) => post.title
+  ?.trim()
+  .toLocaleLowerCase('ko-KR')
+  .replace(/\s+/g, ' ') || post.slug || post.id;
+
+const sortPortfolioPosts = (items) => [...items].sort((a, b) => {
+  const aOrder = Number.isInteger(a.notionOrder) ? a.notionOrder : Number.MAX_SAFE_INTEGER;
+  const bOrder = Number.isInteger(b.notionOrder) ? b.notionOrder : Number.MAX_SAFE_INTEGER;
+
+  if (aOrder !== bOrder) return aOrder - bOrder;
+  return getMillis(b.createdAt || b.updatedAt) - getMillis(a.createdAt || a.updatedAt);
+});
+
 function App() {
   const revealRefs = useRef([]);
   const [hash, setHash] = useState(window.location.hash || '#home');
@@ -226,13 +239,14 @@ function App() {
   }, [user]);
 
   const displayedPosts = useMemo(() => {
-    const seen = new Set();
-    return sortPosts([...publicPosts, ...notionPosts]).filter((post) => {
-      const key = post.slug || post.title;
-      if (seen.has(key)) return false;
-      seen.add(key);
-      return true;
+    const uniquePosts = new Map();
+
+    [...notionPosts, ...sortPosts(publicPosts)].forEach((post) => {
+      const key = getPostDedupeKey(post);
+      if (!uniquePosts.has(key)) uniquePosts.set(key, post);
     });
+
+    return sortPortfolioPosts([...uniquePosts.values()]);
   }, [publicPosts]);
 
   const categories = useMemo(
@@ -242,10 +256,6 @@ function App() {
   const filteredPosts = activeFilter === '전체'
     ? displayedPosts
     : displayedPosts.filter((post) => post.category === activeFilter);
-  const featuredPost = displayedPosts.find((post) => post.featured) || displayedPosts[0];
-  const archivePosts = activeFilter === '전체'
-    ? filteredPosts.filter((post) => post.id !== featuredPost?.id)
-    : filteredPosts;
   const selectedDomain = knowledgeData.domains.find((domain) => domain.id === activeDomain);
   const visibleKnowledgeItems = activeDomain === 'all'
     ? knowledgeItems
@@ -786,63 +796,70 @@ function App() {
             {loadingPosts && <div className="empty-state">새 기록을 불러오는 중입니다.</div>}
             {firebaseError && <div className="setup-notice">{firebaseError}</div>}
 
-            {activeFilter === '전체' && featuredPost && (
-              <article className="featured-case reveal" ref={addReveal}>
-                <div className="featured-visual">
-                  <div className="ui-study-card ui-study-before">
-                    <span>BEFORE</span>
-                    <div className="fake-window">
-                      <i /><i /><i />
-                      <strong>보안 경고</strong>
-                      <small>복잡한 절차와 불분명한 선택지</small>
-                    </div>
-                  </div>
-                  <div className="ui-study-card ui-study-after">
-                    <span>AFTER</span>
-                    <div className="fake-window">
-                      <i /><i /><i />
-                      <strong>안전한 다음 단계</strong>
-                      <small>맥락을 설명하는 명확한 흐름</small>
-                    </div>
-                  </div>
-                  <span className="study-axis">HUMAN FACTOR / SECURITY CONTROL</span>
-                </div>
-                <div className="featured-copy">
-                  <p className="case-meta">FEATURED / {featuredPost.category}</p>
-                  <h3>{featuredPost.title}</h3>
-                  <p>{featuredPost.summary}</p>
-                  <div className="tag-list">
-                    {featuredPost.tags?.map((tag) => <span key={tag}>{tag}</span>)}
-                  </div>
-                  <a className="case-link" href={`#post/${encodeURIComponent(featuredPost.slug || featuredPost.id)}`}>
-                    CASE STUDY <span>↗</span>
-                  </a>
-                </div>
-              </article>
-            )}
-
             <div className="case-grid">
-              {archivePosts.map((post, index) => (
-                <article className="case-card reveal" data-category={post.category} key={post.id} ref={addReveal}>
-                  <div className="case-card-top">
-                    <span>{String(index + 1).padStart(2, '0')}</span>
-                    <span>{post.isNotion ? 'NOTION ARCHIVE' : 'FIELD NOTE'}</span>
-                  </div>
-                  <div>
-                    <p className="case-meta">{post.category || 'WRITING'}</p>
-                    <h3>{post.title}</h3>
-                    <p className="case-summary">{post.summary}</p>
-                  </div>
-                  <div className="case-card-bottom">
-                    <div className="tag-list">
-                      {post.tags?.slice(0, 3).map((tag) => <span key={tag}>{tag}</span>)}
+              {filteredPosts.map((post) => {
+                const postIndex = displayedPosts.findIndex((item) => item.id === post.id) + 1;
+                const displayIndex = String(postIndex).padStart(2, '0');
+
+                return post.featured ? (
+                  <article className="featured-case reveal" key={post.id} ref={addReveal}>
+                    <div className="featured-visual">
+                      <div className="ui-study-card ui-study-before">
+                        <span>BEFORE</span>
+                        <div className="fake-window">
+                          <i /><i /><i />
+                          <strong>보안 경고</strong>
+                          <small>복잡한 절차와 불분명한 선택지</small>
+                        </div>
+                      </div>
+                      <div className="ui-study-card ui-study-after">
+                        <span>AFTER</span>
+                        <div className="fake-window">
+                          <i /><i /><i />
+                          <strong>안전한 다음 단계</strong>
+                          <small>맥락을 설명하는 명확한 흐름</small>
+                        </div>
+                      </div>
+                      <span className="study-axis">HUMAN FACTOR / SECURITY CONTROL</span>
                     </div>
-                    <a className="case-link" href={`#post/${encodeURIComponent(post.slug || post.id)}`} aria-label={`${post.title} 읽기`}>↗</a>
-                  </div>
-                </article>
-              ))}
+                    <div className="featured-copy">
+                      <div className="case-card-top featured-case-top">
+                        <span>{displayIndex}</span>
+                        <span>{post.isNotion ? 'NOTION ARCHIVE' : 'FIELD NOTE'}</span>
+                      </div>
+                      <p className="case-meta">FEATURED / {post.category}</p>
+                      <h3>{post.title}</h3>
+                      <p>{post.summary}</p>
+                      <div className="tag-list">
+                        {post.tags?.map((tag) => <span key={tag}>{tag}</span>)}
+                      </div>
+                      <a className="case-link" href={`#post/${encodeURIComponent(post.slug || post.id)}`}>
+                        CASE STUDY <span>↗</span>
+                      </a>
+                    </div>
+                  </article>
+                ) : (
+                  <article className="case-card reveal" data-category={post.category} key={post.id} ref={addReveal}>
+                    <div className="case-card-top">
+                      <span>{displayIndex}</span>
+                      <span>{post.isNotion ? 'NOTION ARCHIVE' : 'FIELD NOTE'}</span>
+                    </div>
+                    <div>
+                      <p className="case-meta">{post.category || 'WRITING'}</p>
+                      <h3>{post.title}</h3>
+                      <p className="case-summary">{post.summary}</p>
+                    </div>
+                    <div className="case-card-bottom">
+                      <div className="tag-list">
+                        {post.tags?.slice(0, 3).map((tag) => <span key={tag}>{tag}</span>)}
+                      </div>
+                      <a className="case-link" href={`#post/${encodeURIComponent(post.slug || post.id)}`} aria-label={`${post.title} 읽기`}>↗</a>
+                    </div>
+                  </article>
+                );
+              })}
             </div>
-            {archivePosts.length === 0 && <div className="empty-state">이 분류의 기록은 아직 없습니다.</div>}
+            {filteredPosts.length === 0 && <div className="empty-state">이 분류의 기록은 아직 없습니다.</div>}
           </div>
         </section>
 
