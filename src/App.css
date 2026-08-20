@@ -1277,14 +1277,24 @@ select:focus-visible {
   align-items: start;
   padding: 24px;
   border-bottom: 1px solid var(--line);
+  color: inherit;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 160ms ease, color 160ms ease;
 }
 
 .knowledge-note:nth-child(odd) {
   border-right: 1px solid var(--line);
 }
 
-.knowledge-note:hover {
+.knowledge-note:hover,
+.knowledge-note:focus-visible {
   background: rgba(202, 255, 71, 0.28);
+}
+
+.knowledge-note:focus-visible {
+  outline: 3px solid var(--blue);
+  outline-offset: -3px;
 }
 
 .note-index,
@@ -1315,6 +1325,51 @@ select:focus-visible {
 .knowledge-note time {
   color: var(--muted);
   white-space: nowrap;
+}
+
+.note-meta {
+  display: grid;
+  justify-items: end;
+  gap: 18px;
+}
+
+.note-open {
+  color: var(--blue);
+  font-family: var(--mono);
+  font-size: 0.58rem;
+  font-weight: 900;
+  letter-spacing: 0.06em;
+  opacity: 0;
+  transform: translateX(-6px);
+  transition: opacity 160ms ease, transform 160ms ease;
+}
+
+.knowledge-note:hover .note-open,
+.knowledge-note:focus-visible .note-open {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.knowledge-article-hero .article-breadcrumb span:last-child {
+  color: var(--acid);
+}
+
+.knowledge-markdown-body {
+  min-height: 280px;
+}
+
+.content-status {
+  padding: 24px;
+  border: 1px solid var(--line);
+  background: var(--paper);
+  font-family: var(--mono);
+  font-size: 0.76rem;
+  font-weight: 800;
+}
+
+.content-status-error {
+  border-color: var(--coral);
+  color: var(--coral);
 }
 
 .focus-section {
@@ -2264,8 +2319,18 @@ select:focus-visible {
     grid-template-columns: 34px minmax(0, 1fr);
   }
 
-  .knowledge-note time {
+  .note-meta {
     grid-column: 2;
+    grid-template-columns: 1fr auto;
+    justify-items: start;
+    align-items: center;
+    width: 100%;
+  }
+
+  .note-open {
+    justify-self: end;
+    opacity: 1;
+    transform: none;
   }
 
   .ui-study-card {
