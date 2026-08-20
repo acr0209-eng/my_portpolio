@@ -37,42 +37,6 @@ const emptyDraft = {
   published: true,
 };
 
-const focusTracks = [
-  {
-    number: '01',
-    title: 'Infrastructure',
-    label: '구조를 이해하기',
-    description: 'Linux와 운영체제, 네트워크의 동작 원리를 실습으로 연결합니다.',
-  },
-  {
-    number: '02',
-    title: 'Cloud Security',
-    label: '권한을 설계하기',
-    description: '클라우드 환경의 접근 제어와 안전한 운영 구조를 탐구합니다.',
-  },
-  {
-    number: '03',
-    title: 'Human Factors',
-    label: '우회를 줄이기',
-    description: '사람의 행동과 업무 맥락을 고려해 실제로 지켜지는 보안을 고민합니다.',
-  },
-  {
-    number: '04',
-    title: 'Insider Risk',
-    label: '맥락을 읽기',
-    description: '자산 가치, 권한, 조직 책임을 함께 보며 내부자 위험을 분석합니다.',
-  },
-];
-
-const learningItems = [
-  'C',
-  'Linux',
-  'Operating Systems',
-  'Network',
-  'Secure Coding',
-  'Web Security',
-];
-
 const experienceItems = [
   {
     period: 'NOW',
@@ -86,13 +50,6 @@ const experienceItems = [
     meta: 'Industrial Security',
     description: '보안 기술, 조직, 정책, 데이터 분석을 함께 학습하며 보안 문제를 넓게 바라보는 관점을 쌓고 있습니다.',
   },
-];
-
-const principles = [
-  '동작 원리를 먼저 이해합니다.',
-  '작게라도 직접 구현합니다.',
-  '기술과 조직의 맥락을 함께 봅니다.',
-  '배운 것을 글로 남겨 다시 검증합니다.',
 ];
 
 const notionPosts = postsData.map((post) => ({
@@ -155,7 +112,8 @@ function App() {
   const [hash, setHash] = useState(window.location.hash || '#home');
   const [activeFilter, setActiveFilter] = useState('전체');
   const [activeDomain, setActiveDomain] = useState('all');
-  const [activeKnowledgeType, setActiveKnowledgeType] = useState('ALL');
+  const [knowledgeQuery, setKnowledgeQuery] = useState('');
+  const [visibleKnowledgeLimit, setVisibleKnowledgeLimit] = useState(12);
   const [publicPosts, setPublicPosts] = useState([]);
   const [adminPosts, setAdminPosts] = useState([]);
   const [loadingPosts, setLoadingPosts] = useState(isFirebaseConfigured);
@@ -190,6 +148,13 @@ function App() {
   }, []);
 
   useEffect(() => {
+    if (!['#home', '#about', '#work', '#knowledge', '#experience'].includes(hash)) return;
+    window.requestAnimationFrame(() => {
+      document.querySelector(hash)?.scrollIntoView({ behavior: 'auto', block: 'start' });
+    });
+  }, [hash]);
+
+  useEffect(() => {
     const prefersReducedMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
     const observer = typeof IntersectionObserver === 'function' && !prefersReducedMotion
       ? new IntersectionObserver(
@@ -209,7 +174,7 @@ function App() {
     });
 
     return () => observer?.disconnect();
-  }, [hash, activeFilter, activeDomain, activeKnowledgeType, loadingPosts]);
+  }, [hash, activeFilter, activeDomain, loadingPosts]);
 
   useEffect(() => {
     if (!db) {
@@ -282,9 +247,15 @@ function App() {
     ? filteredPosts.filter((post) => post.id !== featuredPost?.id)
     : filteredPosts;
   const selectedDomain = knowledgeData.domains.find((domain) => domain.id === activeDomain);
-  const visibleKnowledgeItems = selectedDomain
-    ? selectedDomain.items.filter((item) => activeKnowledgeType === 'ALL' || item.type === activeKnowledgeType)
-    : [];
+  const visibleKnowledgeItems = activeDomain === 'all'
+    ? knowledgeItems
+    : knowledgeItems.filter((item) => item.domainId === activeDomain);
+  const normalizedKnowledgeQuery = knowledgeQuery.trim().toLocaleLowerCase('ko-KR');
+  const filteredKnowledgeItems = normalizedKnowledgeQuery
+    ? visibleKnowledgeItems.filter((item) =>
+      `${item.title} ${item.domainTitle} ${item.domainKorean}`.toLocaleLowerCase('ko-KR').includes(normalizedKnowledgeQuery))
+    : visibleKnowledgeItems;
+  const displayedKnowledgeItems = filteredKnowledgeItems.slice(0, visibleKnowledgeLimit);
 
   const isAdminRoute = hash === '#admin';
   const canUseAdmin = isFirebaseConfigured && Boolean(ownerUid);
@@ -330,12 +301,14 @@ function App() {
     return () => controller.abort();
   }, [knowledgeSlug, selectedKnowledgeItem]);
 
-  const scrollToKnowledge = (selector = '#knowledge') => {
-    window.requestAnimationFrame(() => {
-      window.requestAnimationFrame(() => {
-        document.querySelector(selector)?.scrollIntoView({ behavior: 'auto', block: 'start' });
-      });
-    });
+  useEffect(() => {
+    setVisibleKnowledgeLimit(12);
+  }, [activeDomain, knowledgeQuery]);
+
+  const handleKnowledgeDomainChange = (domainId) => {
+    setActiveDomain(domainId);
+    setKnowledgeQuery('');
+    setVisibleKnowledgeLimit(12);
   };
 
   const handleLogin = async (event) => {
@@ -467,8 +440,7 @@ function App() {
           <nav className="nav-links" aria-label="주요 메뉴">
             <a href="#about">ABOUT</a>
             <a href="#work">WORK</a>
-            <a href="#knowledge">KNOWLEDGE</a>
-            <a href="#focus">FOCUS</a>
+            <a href="#knowledge">STUDY</a>
             <a href="#experience">JOURNEY</a>
           </nav>
         )}
@@ -714,19 +686,18 @@ function App() {
             <div className="hero-copy reveal" ref={addReveal}>
               <div className="hero-status">
                 <span className="status-dot" />
-                LEARNING MODE / ACTIVE
+                SECURITY STUDENT / SEOUL
               </div>
               <h1>
-                기술과 조직 사이에서,
-                <span>우회되지 않는 보안</span>을 탐구합니다.
+                기술과 조직을 함께 보는
+                <span>보안 학습자</span>입니다.
               </h1>
               <p className="hero-lead">
-                산업보안을 전공하며 인프라·클라우드·네트워크 보안을 배우고,
-                직접 실습한 과정과 판단의 근거를 기록합니다.
+                산업보안을 전공하며 인프라·클라우드 보안을 직접 실습하고 기록합니다.
               </p>
               <div className="hero-actions">
-                <a className="primary-button" href="#work">SELECTED WORK <span>↓</span></a>
-                <a className="text-link" href={githubUrl} target="_blank" rel="noreferrer">GITHUB ↗</a>
+                <a className="primary-button" href="#work">VIEW WORK <span>↓</span></a>
+                <a className="text-link" href="#knowledge">STUDY 57 →</a>
               </div>
             </div>
 
@@ -768,13 +739,12 @@ function App() {
           <div className="container">
             <div className="section-intro reveal" ref={addReveal}>
               <p className="section-kicker">01 / ABOUT</p>
-              <h2>보안은 기술만의 문제가<br />아니라고 믿습니다.</h2>
+              <h2>산업보안을 공부합니다.</h2>
             </div>
-            <div className="about-grid">
+            <div className="about-compact reveal" ref={addReveal}>
               <div className="about-statement reveal" ref={addReveal}>
                 <p>
-                  중앙대학교에서 산업보안을 전공하며 기술, 조직, 정책이 만나는 지점을 공부하고 있습니다.
-                  아직 완성된 전문가라기보다, 배운 내용을 손으로 확인하고 글로 설명할 수 있는 사람으로 성장하는 중입니다.
+                  중앙대학교에서 기술·조직·정책이 만나는 보안을 배우고, 실습 결과를 글로 남깁니다.
                 </p>
                 <div className="profile-note">
                   <span className="profile-monogram">이재원</span>
@@ -784,14 +754,6 @@ function App() {
                   </div>
                 </div>
               </div>
-              <ol className="principle-list reveal" ref={addReveal}>
-                {principles.map((principle, index) => (
-                  <li key={principle}>
-                    <span>{String(index + 1).padStart(2, '0')}</span>
-                    <p>{principle}</p>
-                  </li>
-                ))}
-              </ol>
             </div>
           </div>
         </section>
@@ -803,7 +765,7 @@ function App() {
                 <p className="section-kicker">02 / SELECTED WORK</p>
                 <h2>Case files & field notes</h2>
               </div>
-              <p>Notion에서 관리하던 공개 프로젝트와 학습 기록을 포트폴리오 안에서 읽을 수 있도록 정리했습니다.</p>
+              <p>대표 프로젝트와 케이스 스터디입니다.</p>
             </div>
 
             <div className="filter-bar" role="group" aria-label="글 분류">
@@ -889,111 +851,78 @@ function App() {
             <div className="section-heading reveal" ref={addReveal}>
               <div>
                 <p className="section-kicker">03 / KNOWLEDGE ATLAS</p>
-                <h2>Notion, mapped by domain</h2>
+                <h2>Study Notes</h2>
               </div>
-              <p>
-                Notion의 주요 학습 영역을 6개 도메인과 6개 기록 형식으로 다시 분류했습니다.
-                프로젝트만이 아니라 강의 노트, 실습, 보고서, 분석 기록까지 한 흐름에서 볼 수 있습니다.
-              </p>
+              <p>Notion 공부 기록 57개를 6개 분야로 정리했습니다.</p>
             </div>
 
             <div className="atlas-summary reveal" ref={addReveal}>
               <div>
                 <strong>{knowledgeData.totalItems}</strong>
-                <span>MAPPED NOTES</span>
+                <span>STUDY NOTES</span>
               </div>
               <div>
                 <strong>{knowledgeData.domains.length}</strong>
-                <span>SECURITY DOMAINS</span>
-              </div>
-              <div>
-                <strong>{knowledgeData.contentTypes.length}</strong>
-                <span>CONTENT TYPES</span>
-              </div>
-              <div className="atlas-legend">
-                {knowledgeData.contentTypes.map((type) => <span key={type}>{type}</span>)}
+                <span>LEARNING DOMAINS</span>
               </div>
             </div>
 
-            {activeDomain === 'all' ? (
-              <div className="domain-grid">
+            <div className="knowledge-browser">
+              <div className="type-filter study-domain-filter" role="group" aria-label="학습 분야">
+                <button
+                  type="button"
+                  className={activeDomain === 'all' ? 'active' : ''}
+                  onClick={() => handleKnowledgeDomainChange('all')}
+                  aria-pressed={activeDomain === 'all'}
+                >
+                  ALL STUDY <sup>{knowledgeData.totalItems}</sup>
+                </button>
                 {knowledgeData.domains.map((domain) => (
                   <button
-                    className="domain-card reveal"
                     type="button"
                     key={domain.id}
-                    ref={addReveal}
-                    onClick={() => {
-                      setActiveDomain(domain.id);
-                      setActiveKnowledgeType('ALL');
-                      scrollToKnowledge('.atlas-detail');
-                    }}
+                    className={activeDomain === domain.id ? 'active' : ''}
+                    onClick={() => handleKnowledgeDomainChange(domain.id)}
+                    aria-pressed={activeDomain === domain.id}
                   >
-                    <div className="domain-card-top">
-                      <span>{domain.number}</span>
-                      <strong>{String(domain.items.length).padStart(2, '0')}</strong>
-                    </div>
-                    <p className="domain-korean">{domain.korean}</p>
-                    <h3>{domain.title}</h3>
-                    <p className="domain-description">{domain.description}</p>
-                    <div className="domain-keywords">
-                      {domain.keywords.map((keyword) => <span key={keyword}>{keyword}</span>)}
-                    </div>
-                    <div className="domain-preview">
-                      {domain.items.slice(0, 3).map((item) => (
-                        <span key={item.title}>{item.title}</span>
-                      ))}
-                    </div>
-                    <span className="domain-open">OPEN COLLECTION ↗</span>
+                    {domain.number} {domain.title} <sup>{domain.items.length}</sup>
                   </button>
                 ))}
               </div>
-            ) : (
-              <div className="atlas-detail">
-                <div className="atlas-detail-header">
-                  <button
-                    className="atlas-back"
-                    type="button"
-                    onClick={() => {
-                      setActiveDomain('all');
-                      setActiveKnowledgeType('ALL');
-                      scrollToKnowledge();
-                    }}
-                  >
-                    ← ALL DOMAINS
-                  </button>
-                  <div>
-                    <p className="section-kicker">{selectedDomain.number} / {selectedDomain.korean}</p>
-                    <h3>{selectedDomain.title}</h3>
-                    <p>{selectedDomain.description}</p>
-                  </div>
-                  <strong>{selectedDomain.items.length}</strong>
-                </div>
 
-                <div className="type-filter" role="group" aria-label="기록 형식">
-                  <button
-                    type="button"
-                    className={activeKnowledgeType === 'ALL' ? 'active' : ''}
-                    onClick={() => setActiveKnowledgeType('ALL')}
-                  >
-                    ALL <sup>{selectedDomain.items.length}</sup>
-                  </button>
-                  {knowledgeData.contentTypes
-                    .filter((type) => selectedDomain.items.some((item) => item.type === type))
-                    .map((type) => (
-                      <button
-                        type="button"
-                        key={type}
-                        className={activeKnowledgeType === type ? 'active' : ''}
-                        onClick={() => setActiveKnowledgeType(type)}
-                      >
-                        {type} <sup>{selectedDomain.items.filter((item) => item.type === type).length}</sup>
-                      </button>
-                    ))}
+              <div className="atlas-detail">
+                <div className="knowledge-toolbar">
+                  <label>
+                    <span>SEARCH NOTES</span>
+                    <input
+                      type="search"
+                      value={knowledgeQuery}
+                      onChange={(event) => setKnowledgeQuery(event.target.value)}
+                      placeholder="제목 또는 분야 검색"
+                    />
+                  </label>
+                  <p><strong>{filteredKnowledgeItems.length}</strong> NOTES</p>
+                </div>
+                <div className="atlas-detail-header atlas-study-header">
+                  <div className="atlas-scope-count">
+                    <span>{activeDomain === 'all' ? 'ALL' : selectedDomain.number}</span>
+                    <strong>{filteredKnowledgeItems.length} / {knowledgeData.totalItems}</strong>
+                  </div>
+                  <div>
+                    <p className="section-kicker">
+                      {activeDomain === 'all' ? 'STUDY ARCHIVE / 전체 학습 기록' : `${selectedDomain.number} / ${selectedDomain.korean}`}
+                    </p>
+                    <h3>{activeDomain === 'all' ? 'All Study Notes' : selectedDomain.title}</h3>
+                    <p>
+                      {activeDomain === 'all'
+                        ? '검색하거나 분야를 선택해 빠르게 좁힐 수 있습니다.'
+                        : selectedDomain.description}
+                    </p>
+                  </div>
                 </div>
 
                 <div className="knowledge-note-list">
-                  {visibleKnowledgeItems.map((item, index) => (
+                  {displayedKnowledgeItems.map((item, index) => (
                     <a
                       key={item.id}
                       className="knowledge-note"
@@ -1002,7 +931,7 @@ function App() {
                     >
                       <span className="note-index">{String(index + 1).padStart(2, '0')}</span>
                       <div>
-                        <span className="note-type">{item.type}</span>
+                        <span className="note-type">{activeDomain === 'all' ? `${item.domainTitle} / STUDY` : 'STUDY'}</span>
                         <h4>{item.title}</h4>
                       </div>
                       <div className="note-meta">
@@ -1012,31 +941,18 @@ function App() {
                     </a>
                   ))}
                 </div>
-              </div>
-            )}
-          </div>
-        </section>
-
-        <section id="focus" className="section focus-section">
-          <div className="container">
-            <div className="section-intro light reveal" ref={addReveal}>
-              <p className="section-kicker">04 / FOCUS</p>
-              <h2>What I’m building toward</h2>
-            </div>
-            <div className="focus-grid">
-              {focusTracks.map((track) => (
-                <article className="focus-card reveal" key={track.number} ref={addReveal}>
-                  <div className="focus-number">{track.number}</div>
-                  <p className="focus-label">{track.label}</p>
-                  <h3>{track.title}</h3>
-                  <p>{track.description}</p>
-                </article>
-              ))}
-            </div>
-            <div className="learning-ribbon reveal" ref={addReveal}>
-              <p>CURRENTLY LEARNING</p>
-              <div>
-                {learningItems.map((item) => <span key={item}>{item}</span>)}
+                {filteredKnowledgeItems.length === 0 && (
+                  <div className="empty-state">검색 결과가 없습니다.</div>
+                )}
+                {displayedKnowledgeItems.length < filteredKnowledgeItems.length && (
+                  <button
+                    className="knowledge-more"
+                    type="button"
+                    onClick={() => setVisibleKnowledgeLimit((current) => current + 12)}
+                  >
+                    MORE NOTES <span>{displayedKnowledgeItems.length} / {filteredKnowledgeItems.length}</span>
+                  </button>
+                )}
               </div>
             </div>
           </div>
@@ -1046,10 +962,10 @@ function App() {
           <div className="container">
             <div className="section-heading reveal" ref={addReveal}>
               <div>
-                <p className="section-kicker">05 / JOURNEY</p>
-                <h2>Learning in public</h2>
+                <p className="section-kicker">04 / JOURNEY</p>
+                <h2>Journey</h2>
               </div>
-              <p>교육과 전공 수업에서 배운 개념을 실습, 프로젝트, 글로 연결하고 있습니다.</p>
+              <p>현재의 학습 배경입니다.</p>
             </div>
             <div className="journey-list">
               {experienceItems.map((item, index) => (
@@ -1070,18 +986,17 @@ function App() {
         <section className="contact-section">
           <div className="container contact-card reveal" ref={addReveal}>
             <div>
-              <p className="section-kicker">06 / CONNECT</p>
-              <h2>기록은 계속<br />업데이트됩니다.</h2>
+              <p className="section-kicker">05 / LINKS</p>
+              <h2>More</h2>
             </div>
             <div className="contact-copy">
-              <p>새로운 실습, 보안 사례 분석, 프로젝트 과정을 GitHub와 Tistory에 꾸준히 남기고 있습니다.</p>
               <div className="contact-links">
                 <a href={githubUrl} target="_blank" rel="noreferrer">GITHUB <span>↗</span></a>
                 <a href={tistoryUrl} target="_blank" rel="noreferrer">TISTORY <span>↗</span></a>
                 <a href={portfolioNotionUrl} target="_blank" rel="noreferrer">NOTION <span>↗</span></a>
+                </div>
               </div>
             </div>
-          </div>
         </section>
       </main>
 

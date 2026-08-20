@@ -1,14 +1,9 @@
 {
   "updatedAt": "2026-08-21",
-  "source": "Notion workspace inventory",
-  "totalItems": 73,
+  "source": "Notion study notes",
+  "totalItems": 57,
   "contentTypes": [
-    "PROJECT",
-    "REPORT",
-    "LAB",
-    "ANALYSIS",
-    "STUDY",
-    "REFERENCE"
+    "STUDY"
   ],
   "domains": [
     {
@@ -25,86 +20,6 @@
         "CI/CD"
       ],
       "items": [
-        {
-          "title": "보고서 · 근두운 IAM 협업 구조 현황 및 개선안",
-          "type": "REPORT",
-          "date": "2026-08-18",
-          "id": "3c03f93e-21d5-8146-8dc4-ec6dd24986f4",
-          "slug": "3c03f93e21d581468dc4ec6dd24986f4",
-          "notionUrl": "https://app.notion.com/p/3c03f93e21d581468dc4ec6dd24986f4?pvs=204",
-          "summary": "🔧 개선 필요 IAM Role 생성 표준화, Boundary 자동 부착, PassRole 최소권한화, IAM 변경 PR 리뷰 구조, IAMFullAccess 축소",
-          "hasContent": false
-        },
-        {
-          "title": "실습 · Terraform IAM 관리 시스템 구축",
-          "type": "LAB",
-          "date": "2026-08-17",
-          "id": "3bf3f93e-21d5-81e8-9894-dd15225c31a5",
-          "slug": "3bf3f93e21d581e89894dd15225c31a5",
-          "notionUrl": "https://app.notion.com/p/3bf3f93e21d581e89894dd15225c31a5?pvs=204",
-          "summary": "2026 08 17 실습 기록: 개인 AWS 계정에서 Terraform으로 IAM Role을 만들고, AssumeRole → Permissions Boundary → PassRole까지 실제 성공/실패를 검증했다. 팀 AWS에는 terraform",
-          "hasContent": false
-        },
-        {
-          "title": "참고 · IAM 권한 안전 위임 — Permissions Boundary + Terraform PR",
-          "type": "REFERENCE",
-          "date": "2026-08-17",
-          "id": "3bf3f93e-21d5-81f1-be7d-e7d20316ec23",
-          "slug": "3bf3f93e21d581f1be7de7d20316ec23",
-          "notionUrl": "https://app.notion.com/p/3bf3f93e21d581f1be7de7d20316ec23?pvs=204",
-          "summary": "작업 권한을 넓게 위임하더라도, Permissions Boundary로 최대 권한선을 고정하고 IAM 변경은 Terraform + PR",
-          "hasContent": false
-        },
-        {
-          "title": "실습 · 근두운 IAM 관리 시스템 설계 — Boundary + PassRole",
-          "type": "LAB",
-          "date": "2026-08-17",
-          "id": "3bf3f93e-21d5-819d-8be7-e5860f56edf5",
-          "slug": "3bf3f93e21d5819d8be7e5860f56edf5",
-          "notionUrl": "https://app.notion.com/p/3bf3f93e21d5819d8be7e5860f56edf5?pvs=204",
-          "summary": "❌ 허용 Project Role PassRole ✅ Admin Role PassRole ❌ 비허용 Service PassRole ❌ ↓ 검증 완료 [팀 Repo] platform IAM",
-          "hasContent": false
-        },
-        {
-          "title": "참고 · Terraform HCL 첫 이해와 Bootstrap 구조",
-          "type": "REFERENCE",
-          "date": "2026-08-17",
-          "id": "3bf3f93e-21d5-8128-813d-c555891a2dd5",
-          "slug": "3bf3f93e21d58128813dc555891a2dd5",
-          "notionUrl": "https://app.notion.com/p/3bf3f93e21d58128813dc555891a2dd5?pvs=204",
-          "summary": "원문 참고: https://kintoun blog.vercel.app/terraform hcl%EC%9D%84 %EC%B2%98%EC%9D%8C %EB%A7%8C%EC%A7%84 %EB%82%A0 bootstrap %EC%82%BD%EC%A7%88%EA%B8%B0 3bed23c825c080dd8321d8c6cdb174cb",
-          "hasContent": false
-        },
-        {
-          "title": "근두운 1차 프로젝트 보고서",
-          "type": "PROJECT",
-          "date": "2026-08-16",
-          "id": "3be3f93e-21d5-814a-80ad-da54e791d0ef",
-          "slug": "3be3f93e21d5814a80adda54e791d0ef",
-          "notionUrl": "https://app.notion.com/p/3be3f93e21d5814a80adda54e791d0ef?pvs=204",
-          "summary": "1. 개요",
-          "hasContent": false
-        },
-        {
-          "title": "화이트햇프로젝트: 클라우드 인프라 침해 사고 대응 및 SecOps 인프라 구축",
-          "type": "PROJECT",
-          "date": "2026-08-16",
-          "id": "3b43f93e-21d5-811f-8bd0-d722cb5fa2bb",
-          "slug": "3b43f93e21d5811f8bd0d722cb5fa2bb",
-          "notionUrl": "https://app.notion.com/p/3b43f93e21d5811f8bd0d722cb5fa2bb?pvs=204",
-          "summary": "NO.76 클라우드 SecOps 도구 선정 및 구축 방향",
-          "hasContent": false
-        },
-        {
-          "title": "8/16 IAM 권한 제공 패턴 조사 및 실습",
-          "type": "LAB",
-          "date": "2026-08-16",
-          "id": "3be3f93e-21d5-81d0-9cf0-ceadc66b9b6b",
-          "slug": "3be3f93e21d581d09cf0ceadc66b9b6b",
-          "notionUrl": "https://app.notion.com/p/3be3f93e21d581d09cf0ceadc66b9b6b?pvs=204",
-          "summary": "실습 결과: 권한이 없는 IAM 사용자에서 S3 접근이 거부되는 것을 확인한 뒤, S3 읽기 전용 Role을 생성하고 sts:AssumeRole 권한을 최소 범위로 부여하여 Role 전환 후 S3 조회가 정상",
-          "hasContent": false
-        },
         {
           "title": "8/16 Cloudflare · AWS WAF · Shield 비용 및 적용안",
           "type": "STUDY",
@@ -442,16 +357,6 @@
           "hasContent": true
         },
         {
-          "title": "삼성바이오로직스 영업비밀 유출 사건 분석",
-          "type": "ANALYSIS",
-          "date": "2026-07-26",
-          "id": "3a93f93e-21d5-8163-ac60-ee5c2987ecb3",
-          "slug": "3a93f93e21d58163ac60ee5c2987ecb3",
-          "notionUrl": "https://app.notion.com/p/3a93f93e21d58163ac60ee5c2987ecb3?pvs=204",
-          "summary": "영업비밀은 문서 자체뿐 아니라 업무 절차와 운영 노하우까지 포함될 수 있습니다.",
-          "hasContent": false
-        },
-        {
           "title": "기업경영과 보안",
           "type": "STUDY",
           "date": "2026-07-26",
@@ -460,16 +365,6 @@
           "notionUrl": "https://app.notion.com/p/3a93f93e21d58185bcbaccdc754e9fa0?pvs=204",
           "summary": "기업 의사결정, 보안 거버넌스, 내부통제 관점에서 정리한 기록입니다.",
           "hasContent": true
-        },
-        {
-          "title": "인간공학적 보안 UI 개선 프로젝트",
-          "type": "PROJECT",
-          "date": "2026-07-26",
-          "id": "3a93f93e-21d5-8101-ae71-e6e70193b5f4",
-          "slug": "3a93f93e21d58101ae71e6e70193b5f4",
-          "notionUrl": "https://app.notion.com/p/3a93f93e21d58101ae71e6e70193b5f4?pvs=204",
-          "summary": "업무 상황에서 보안 우회 행동을 줄이기 위해 수정 전후 UI를 비교하고 설문으로 검증한 프로젝트입니다.",
-          "hasContent": false
         }
       ]
     },
@@ -538,36 +433,6 @@
           "hasContent": true
         },
         {
-          "title": "실습 · Telegram 기반 CTI 분석 보고서",
-          "type": "REPORT",
-          "date": "2026-08-19",
-          "id": "3c13f93e-21d5-810f-b00c-e24b305633bc",
-          "slug": "3c13f93e21d5810fb00ce24b305633bc",
-          "notionUrl": "https://app.notion.com/p/3c13f93e21d5810fb00ce24b305633bc?pvs=204",
-          "summary": "실습 주제: Telegram 기반 Infostealer/유출 채널 탐색 및 1차 분석",
-          "hasContent": false
-        },
-        {
-          "title": "공통 과제 · GitHub Actions SecOps CI 실습",
-          "type": "LAB",
-          "date": "2026-08-18",
-          "id": "3c03f93e-21d5-8128-8ced-ef64ad32b569",
-          "slug": "3c03f93e21d581288cedef64ad32b569",
-          "notionUrl": "https://app.notion.com/p/3c03f93e21d581288cedef64ad32b569?pvs=204",
-          "summary": "메인 실습 레포: kintoun secops/secops actions lab github.com/kintoun secops/secops actions lab",
-          "hasContent": false
-        },
-        {
-          "title": "보고서 · GitHub Actions SecOps CI 파이프라인 구축 실습",
-          "type": "REPORT",
-          "date": "2026-08-18",
-          "id": "3c03f93e-21d5-810a-9dac-dc9adac7052b",
-          "slug": "3c03f93e21d5810a9dacdc9adac7052b",
-          "notionUrl": "https://app.notion.com/p/3c03f93e21d5810a9dacdc9adac7052b?pvs=204",
-          "summary": "개인 Fork: acr0209 eng/secops actions lab github.com/acr0209 eng/secops actions lab",
-          "hasContent": false
-        },
-        {
           "title": "ISMS-P · 06 · 침해사고 · 재해 · AWS 네이티브",
           "type": "STUDY",
           "date": "2026-08-17",
@@ -624,16 +489,6 @@
           "hasContent": true
         },
         {
-          "title": "03 · Express.js 라우팅 실습",
-          "type": "LAB",
-          "date": "2026-08-10",
-          "id": "3b83f93e-21d5-8157-b47e-ff0debd020e5",
-          "slug": "3b83f93e21d58157b47eff0debd020e5",
-          "notionUrl": "https://app.notion.com/p/3b83f93e21d58157b47eff0debd020e5?pvs=204",
-          "summary": "http://localhost:3000/js/test.js → public/js/test.js",
-          "hasContent": false
-        },
-        {
           "title": "모던 웹 개발 및 보안",
           "type": "STUDY",
           "date": "2026-08-09",
@@ -672,16 +527,6 @@
           "notionUrl": "https://app.notion.com/p/3a93f93e21d581b182f7fce5c7735640?pvs=204",
           "summary": "정규표현식 서비스 거부 공격(ReDoS)의 동작 원리와 취약한 패턴을 직접 구현하며 분석한 보안 실습 보고서입니다.",
           "hasContent": true
-        },
-        {
-          "title": "네이버 검색 API 연동부터 실행까지: Python 실습 기록",
-          "type": "LAB",
-          "date": "2026-07-26",
-          "id": "3a93f93e-21d5-816f-a57c-e581f26ef334",
-          "slug": "3a93f93e21d5816fa57ce581f26ef334",
-          "notionUrl": "https://app.notion.com/p/3a93f93e21d5816fa57ce581f26ef334?pvs=204",
-          "summary": "블로그 검색 API를 연동하고 Python으로 키워드 검색 프로그램을 실행한 실습 기록입니다.",
-          "hasContent": false
         }
       ]
     },
@@ -748,16 +593,6 @@
           "notionUrl": "https://app.notion.com/p/3b23f93e21d58190976bc5b7f4491945?pvs=204",
           "summary": "Data Link Layer는 같은 네트워크 안에서 MAC 주소를 기준으로 Frame을 전달하고, ARP는 IP 주소에 대응하는 MAC 주소를 찾는다. Network Layer는 Router를 통해 Datagram의 경로를 결정하고 전달한다. IPv4 환경에서는 Subnet, Broadcast, NAT, DHCP가 주소 관리와 통신에 사용되며 주소 부족 문제를 해결하기 위해 IPv6가 개발되었다. 개념 확인 퀴즈 1. IP 주소로 MAC 주소를 찾는 프로토콜은?2. Switch는 어떤 주소를 기준으로 동작하는가?3. Routing과 Forwarding의 차이는?4. NAT의 주요 목적은?5. DHCP의 역할은? 정답 1. ARP2.…",
           "hasContent": true
-        },
-        {
-          "title": "TCP 소켓 통신 실습 기록",
-          "type": "LAB",
-          "date": "2026-07-26",
-          "id": "3a93f93e-21d5-81a2-bf80-cc685ef8f2aa",
-          "slug": "3a93f93e21d581a2bf80cc685ef8f2aa",
-          "notionUrl": "https://app.notion.com/p/3a93f93e21d581a2bf80cc685ef8f2aa?pvs=204",
-          "summary": "Python TCP 서버와 클라이언트를 직접 실행하며 소켓 연결, 메시지 송수신, 터미널 실습 흐름을 정리한 기록입니다.",
-          "hasContent": false
         }
       ]
     },
