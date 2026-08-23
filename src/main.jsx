@@ -32,6 +32,12 @@ const mergeKnowledgeDomains = (baseDomains = [], currentDomains = []) => {
 
 const installCurrentContentOverlay = () => {
   const originalFetch = window.fetch.bind(window)
+  const overlayFiles = [
+    'knowledge-content-current.json',
+    'knowledge-content-whitehat-core.json',
+    'knowledge-content-whitehat-infra.json',
+    'knowledge-content-whitehat-governance.json',
+  ]
 
   window.fetch = async (input, init) => {
     const requestUrl = typeof input === 'string' ? input : input?.url
@@ -39,27 +45,34 @@ const installCurrentContentOverlay = () => {
       return originalFetch(input, init)
     }
 
-    const currentUrl = requestUrl.replace(/knowledge-content\.json$/, 'knowledge-content-current.json')
-    const [legacyResponse, currentResponse] = await Promise.all([
-      originalFetch(input, init),
-      originalFetch(currentUrl, init).catch(() => null),
-    ])
-
+    const legacyResponse = await originalFetch(input, init)
     if (!legacyResponse.ok) return legacyResponse
 
+    const overlayResponses = await Promise.all(
+      overlayFiles.map((fileName) => {
+        const overlayUrl = requestUrl.replace(/knowledge-content\.json$/, fileName)
+        return originalFetch(overlayUrl, init).catch(() => null)
+      }),
+    )
+
     const legacyData = await legacyResponse.json()
-    const currentData = currentResponse?.ok
-      ? await currentResponse.json()
-      : { notes: {} }
+    const overlays = await Promise.all(
+      overlayResponses.map(async (response) => (
+        response?.ok ? response.json() : { notes: {} }
+      )),
+    )
+
+    const mergedNotes = overlays.reduce(
+      (notes, overlay) => ({ ...notes, ...(overlay.notes || {}) }),
+      { ...(legacyData.notes || {}) },
+    )
+    const latestOverlay = [...overlays].reverse().find((overlay) => overlay.updatedAt)
 
     return new Response(
       JSON.stringify({
         ...legacyData,
-        updatedAt: currentData.updatedAt || legacyData.updatedAt,
-        notes: {
-          ...(legacyData.notes || {}),
-          ...(currentData.notes || {}),
-        },
+        updatedAt: latestOverlay?.updatedAt || legacyData.updatedAt,
+        notes: mergedNotes,
       }),
       {
         status: 200,
