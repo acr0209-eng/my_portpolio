@@ -4,27 +4,45 @@ React + Vite 기반 포트폴리오 사이트입니다.
 
 - 배포: GitHub Pages
 - 글 CMS: Firebase Authentication + Cloud Firestore
-- Notion 대표 작업: `src/data/posts.json`에서 내부 케이스 스터디로 표시
-- Notion 전체 학습 지도: `src/data/knowledge.json`에서 도메인·기록 형식별로 표시
+- Notion 대표 작업: `src/data/posts.json`
+- Notion 학습 지도: `src/data/knowledge.json` + `src/data/knowledge-current.json`
+- 학습노트 본문: `public/knowledge-content.json` + `public/knowledge-content-current.json`
 - 방문자 모니터링 실험: `exposurewatch-backend`
 
 ## 콘텐츠 구조
 
-Notion에서 가져온 콘텐츠는 방문자가 탐색하기 쉽도록 두 층으로 나눕니다.
+Notion에서 관리하는 프로젝트와 학습 기록을 포트폴리오에서 바로 탐색할 수 있도록 구성합니다.
 
-- **Selected Work**: 공개 프로젝트·분석·실습 6개를 사이트 안에서 읽을 수 있는 상세 글로 제공
-- **Knowledge Atlas**: 주요 Notion 기록 73개를 6개 보안 도메인과 6개 기록 형식으로 분류
+- **Selected Work**: 공개 프로젝트·분석·실습을 사이트 내부 Case Study로 제공
+- **Knowledge Atlas**: 기존 학습기록을 보존하면서 최신 Notion 스냅샷을 병합해 표시
+- **Latest study snapshot**: 2026-08-24
+- **Study Notes**: 76개
+- **Learning Domains**: 8개
 
-Knowledge Atlas 도메인:
+Knowledge Atlas의 현재 주요 분야:
 
 - Cloud, IAM & DevSecOps
 - Governance & Human Risk
 - Incident Response & CTI
-- Web & Application Security
-- Systems & Network
+- Web / Application / System / Network Security
 - Container & Cloud Native
+- **3-1학기 · 보안통계학**
+- **3-1학기 · 사이버보안**
+- **3-1학기 · 산업보안범죄**
+- **화이트햇 · AI 오픈소스 / Open Source Supply Chain**
 
-기록 형식은 `PROJECT`, `REPORT`, `LAB`, `ANALYSIS`, `STUDY`, `REFERENCE`를 사용합니다.
+3-1학기에서는 Pandas·EDA·가설검정·ANOVA·회귀분석, 시스템·네트워크·웹 보안, 산업보안범죄와 인간행동·억제·사회학 이론을 정리합니다. 화이트햇 학습기록은 Cloud/DevSecOps·컨테이너·침해사고 대응·CTI·생성형 AI에 더해 Open Source Supply Chain과 Dependency Risk까지 확장합니다.
+
+### 최신 데이터 병합 방식
+
+기존 스냅샷을 삭제하지 않고 최신 데이터를 Overlay합니다.
+
+1. `src/data/knowledge.json`: 기존 Knowledge Atlas 데이터
+2. `src/data/knowledge-current.json`: 최신 Notion 인덱스와 3-1학기·AI 오픈소스 항목
+3. `public/knowledge-content.json`: 기존 학습노트 본문
+4. `public/knowledge-content-current.json`: 최신 본문
+
+동일한 노트 ID가 두 데이터에 존재하면 **최신 데이터와 본문을 우선**합니다. 기존 기록은 그대로 fallback으로 사용할 수 있습니다.
 
 ## 자동 배포
 
