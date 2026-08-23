@@ -105,7 +105,11 @@ const bootstrap = async () => {
   knowledgeData.domains = mergeKnowledgeDomains(
     knowledgeData.domains,
     currentKnowledgeData.domains,
-  )
+  ).map((domain, index) => ({
+    ...domain,
+    number: String(index + 1).padStart(2, '0'),
+  }))
+
   knowledgeData.totalItems = knowledgeData.domains.reduce(
     (total, domain) => total + (domain.items?.length || 0),
     0,
