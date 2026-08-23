@@ -17,14 +17,15 @@ Notion에서 관리하는 프로젝트와 학습 기록을 포트폴리오에서
 - **Knowledge Atlas**: 기존 학습기록을 보존하면서 최신 Notion 스냅샷을 병합해 표시
 - **Latest study snapshot**: 2026-08-24
 - **Study Notes**: 76개
-- **Learning Domains**: 8개
+- **Learning Domains**: 10개
 
 Knowledge Atlas의 현재 주요 분야:
 
 - Cloud, IAM & DevSecOps
 - Governance & Human Risk
 - Incident Response & CTI
-- Web / Application / System / Network Security
+- Web & Application Security
+- Systems & Network
 - Container & Cloud Native
 - **3-1학기 · 보안통계학**
 - **3-1학기 · 사이버보안**
