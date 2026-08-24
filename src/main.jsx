@@ -37,6 +37,7 @@ const installCurrentContentOverlay = () => {
     'knowledge-content-whitehat-core.json',
     'knowledge-content-whitehat-infra.json',
     'knowledge-content-whitehat-governance.json',
+    'knowledge-content-whitehat-isms.json',
   ]
 
   window.fetch = async (input, init) => {
