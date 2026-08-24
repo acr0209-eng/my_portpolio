@@ -6,7 +6,7 @@ React + Vite 기반 포트폴리오 사이트입니다.
 - 글 CMS: Firebase Authentication + Cloud Firestore
 - Notion 대표 작업: `src/data/posts.json`
 - Notion 학습 지도: `src/data/knowledge.json` + `src/data/knowledge-current.json`
-- 학습노트 본문: `public/knowledge-content.json` + `public/knowledge-content-current.json`
+- 학습노트 본문: `public/knowledge-content.json` + 최신 Overlay 파일들
 - 방문자 모니터링 실험: `exposurewatch-backend`
 
 ## 콘텐츠 구조
@@ -41,9 +41,13 @@ Knowledge Atlas의 현재 주요 분야:
 1. `src/data/knowledge.json`: 기존 Knowledge Atlas 데이터
 2. `src/data/knowledge-current.json`: 최신 Notion 인덱스와 3-1학기·AI 오픈소스 항목
 3. `public/knowledge-content.json`: 기존 학습노트 본문
-4. `public/knowledge-content-current.json`: 최신 본문
+4. `public/knowledge-content-current.json`: 3-1학기·최신 추가 본문
+5. `public/knowledge-content-whitehat-core.json`: 웹·Linux·Network·CTI·침해사고 대응 최신 본문
+6. `public/knowledge-content-whitehat-infra.json`: DevSecOps·Container·AWS 최신 본문
+7. `public/knowledge-content-whitehat-governance.json`: Consulting·Governance 최신 본문
+8. `public/knowledge-content-whitehat-isms.json`: ISMS-P 01~10 최신 본문
 
-동일한 노트 ID가 두 데이터에 존재하면 **최신 데이터와 본문을 우선**합니다. 기존 기록은 그대로 fallback으로 사용할 수 있습니다.
+동일한 노트 ID가 여러 데이터에 존재하면 **가장 뒤의 최신 Overlay 본문을 우선**합니다. 기존 기록은 그대로 fallback으로 사용할 수 있습니다.
 
 ## 자동 배포
 
